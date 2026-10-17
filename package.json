@@ -1,0 +1,15 @@
+{
+  "name": "spf-hoang-system",
+  "version": "2.0.0",
+  "description": "Hệ thống Webapp Spf_Hoang và Webapp Quản lý Key (SQLite & JSON Edition)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "express-rate-limit": "^7.5.1"
+  }
+}

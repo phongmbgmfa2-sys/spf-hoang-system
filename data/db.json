@@ -1,0 +1,160 @@
+{
+  "keys": [
+    {
+      "id": "c7742066-d324-4e45-845f-84fb61749b81",
+      "key": "SPF-B78476-0CEB83-7FBCFD",
+      "durationCode": "1d",
+      "durationLabel": "1 ngày",
+      "createdAt": 1792247092686,
+      "expiresAt": 1792333492686,
+      "revoked": false
+    },
+    {
+      "id": "8ae642e8-83ba-4b25-b775-a2b8da47f5fb",
+      "key": "SPF-3074C4-C27D0B-F202E3",
+      "durationCode": "1h",
+      "durationLabel": "1 giờ",
+      "createdAt": 1792246605824,
+      "expiresAt": 1792250205824,
+      "revoked": true
+    },
+    {
+      "id": "4b2609a5-932a-4727-b3b3-60a05bc8cf48",
+      "key": "SPF-A479B9-8FA425-766FF5",
+      "durationCode": "forever",
+      "durationLabel": "Vĩnh viễn",
+      "createdAt": 1792246574224,
+      "expiresAt": null,
+      "revoked": true
+    },
+    {
+      "id": "a92b33c4-ec58-4ab3-b423-b8353d4fb4d9",
+      "key": "SPF-DCD856-843443-01017C",
+      "durationCode": "1d",
+      "durationLabel": "1 ngày",
+      "createdAt": 1792246561297,
+      "expiresAt": 1792332961297,
+      "revoked": true
+    }
+  ],
+  "configs": {
+    "SPF-3074C4-C27D0B-F202E3": {
+      "updatedAt": 1792246724577,
+      "features": {
+        "nhe_tam": {
+          "enabled": false,
+          "value": 53
+        },
+        "tang_nhay": {
+          "enabled": false,
+          "value": 50
+        },
+        "buff_man": {
+          "enabled": false,
+          "value": 50
+        },
+        "aim_lock": {
+          "enabled": false,
+          "value": 50
+        },
+        "head_lock": {
+          "enabled": false,
+          "value": 50
+        },
+        "bam_dau": {
+          "enabled": false,
+          "value": 50
+        },
+        "dam_tam": {
+          "enabled": false,
+          "value": 50
+        },
+        "fix_rung": {
+          "enabled": false,
+          "value": 50
+        }
+      },
+      "optimizer": 66
+    }
+  },
+  "logs": [
+    {
+      "id": "9cf58133-3836-4825-b84d-fefb0b229a55",
+      "timestamp": "2026-10-17T14:24:52.687Z",
+      "action": "KEY_CREATED",
+      "detail": "Tạo key SPF-B78476-0CEB83-7FBCFD (1 ngày)"
+    },
+    {
+      "id": "aed1dbda-64e7-40c2-81b7-98ac666176cc",
+      "timestamp": "2026-10-17T14:24:50.449Z",
+      "action": "KEY_REVOKED",
+      "detail": "Thu hồi key SPF-3074C4-C27D0B-F202E3"
+    },
+    {
+      "id": "3a1a7841-fa94-429d-b540-88bb04f65f41",
+      "timestamp": "2026-10-17T14:24:41.944Z",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "detail": "Quản trị viên đăng nhập thành công"
+    },
+    {
+      "id": "16deeaa6-f5b4-4540-95ab-519f9f7e8e5a",
+      "timestamp": "2026-10-17T14:24:38.644Z",
+      "action": "ADMIN_LOGIN_FAILED",
+      "detail": "Nhập sai mật khẩu quản trị"
+    },
+    {
+      "id": "5a62c80d-4564-4d34-a978-dad099f1844d",
+      "timestamp": "2026-10-17T14:24:38.508Z",
+      "action": "ADMIN_LOGIN_FAILED",
+      "detail": "Nhập sai mật khẩu quản trị"
+    },
+    {
+      "id": "35fc1264-db87-4a6e-bc64-040da53d8220",
+      "timestamp": "2026-10-17T14:24:38.380Z",
+      "action": "ADMIN_LOGIN_FAILED",
+      "detail": "Nhập sai mật khẩu quản trị"
+    },
+    {
+      "id": "270e8837-f7a6-478f-9310-cde3ee28ddb3",
+      "timestamp": "2026-10-17T14:24:37.837Z",
+      "action": "ADMIN_LOGIN_FAILED",
+      "detail": "Nhập sai mật khẩu quản trị"
+    },
+    {
+      "id": "7f860259-06c6-47cb-963e-e092817b0b87",
+      "timestamp": "2026-10-17T14:16:45.824Z",
+      "action": "KEY_CREATED",
+      "detail": "Tạo key SPF-3074C4-C27D0B-F202E3 (1 giờ)"
+    },
+    {
+      "id": "8d4aca69-5090-4787-a329-0888ad89c896",
+      "timestamp": "2026-10-17T14:16:18.104Z",
+      "action": "KEY_REVOKED",
+      "detail": "Thu hồi key SPF-DCD856-843443-01017C"
+    },
+    {
+      "id": "7decefd3-a250-46ba-b4a6-74a91caa53ac",
+      "timestamp": "2026-10-17T14:16:16.593Z",
+      "action": "KEY_REVOKED",
+      "detail": "Thu hồi key SPF-A479B9-8FA425-766FF5"
+    },
+    {
+      "id": "e94986ed-7722-4899-8774-da2d4c5d5238",
+      "timestamp": "2026-10-17T14:16:14.224Z",
+      "action": "KEY_CREATED",
+      "detail": "Tạo key SPF-A479B9-8FA425-766FF5 (Vĩnh viễn)"
+    },
+    {
+      "id": "607262b5-e243-4bc9-9c6a-83065fa105ae",
+      "timestamp": "2026-10-17T14:16:01.297Z",
+      "action": "KEY_CREATED",
+      "detail": "Tạo key SPF-DCD856-843443-01017C (1 ngày)"
+    },
+    {
+      "id": "21428850-ffb8-40fe-b50d-1c5c1e467888",
+      "timestamp": "2026-10-17T14:15:56.708Z",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "detail": "Quản trị viên đăng nhập thành công"
+    }
+  ]
+}

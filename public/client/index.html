@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Spf_Hoang — Gaming Control Panel</title>
+  <style>
+    :root {
+      --bg-dark: #040d14;
+      --bg-card: rgba(8, 28, 42, 0.82);
+      --aqua-primary: #00f2fe;
+      --aqua-secondary: #00b4d8;
+      --aqua-deep: #0077b6;
+      --text-main: #e0fbfc;
+      --text-muted: #8ecae6;
+      --danger: #ff4d6d;
+      --success: #06d6a0;
+      --warning: #ffb703;
+      --border-glow: 0 0 14px rgba(0, 242, 254, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #0a2538 0%, var(--bg-dark) 75%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 16px;
+    }
+
+    .app-container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .brand-header {
+      text-align: center;
+      padding: 22px 12px;
+      margin-bottom: 18px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(0, 180, 216, 0.14), rgba(4, 13, 20, 0.92));
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      box-shadow: var(--border-glow);
+    }
+
+    .brand-title {
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #ffffff, var(--aqua-primary), var(--aqua-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 22px rgba(0, 242, 254, 0.55);
+    }
+
+    .sim-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      color: var(--aqua-primary);
+    }
+
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 242, 254, 0.28);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), var(--border-glow);
+      margin-bottom: 18px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #021017;
+      background: linear-gradient(135deg, var(--aqua-primary), var(--aqua-secondary));
+      box-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 24px rgba(0, 242, 254, 0.8);
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
+    }
+
+    .btn-subtext {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: #032b3a;
+      font-weight: 600;
+    }
+
+    .free-key-banner {
+      text-align: center;
+      padding: 10px 14px;
+      margin: 14px 0 18px;
+      border-radius: 10px;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px dashed var(--aqua-primary);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+    }
+
+    .key-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-cyber {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 242, 254, 0.45);
+      background: rgba(2, 12, 20, 0.9);
+      color: var(--aqua-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 1px;
+      outline: none;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .input-cyber:focus {
+      border-color: var(--aqua-primary);
+      box-shadow: 0 0 16px rgba(0, 242, 254, 0.5);
+    }
+
+    .status-box {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+    }
+
+    .status-loading {
+      display: block;
+      background: rgba(0, 180, 216, 0.18);
+      border: 1px solid var(--aqua-secondary);
+      color: var(--aqua-primary);
+    }
+
+    .status-error {
+      display: block;
+      background: rgba(255, 77, 109, 0.16);
+      border: 1px solid var(--danger);
+      color: #ff8fa3;
+    }
+
+    .status-success {
+      display: block;
+      background: rgba(6, 214, 160, 0.16);
+      border: 1px solid var(--success);
+      color: #52f2c2;
+    }
+
+    .demo-box {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(0, 242, 254, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--aqua-primary);
+      border: 1px solid var(--aqua-primary);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 242, 254, 0.15);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .session-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(0, 119, 182, 0.22);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      font-size: 0.88rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      background: rgba(6, 22, 34, 0.9);
+      border: 1px solid rgba(0, 242, 254, 0.22);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.25s ease;
+    }
+
+    .feature-card.active {
+      border-color: var(--aqua-primary);
+      box-shadow: 0 0 18px rgba(0, 242, 254, 0.35);
+      background: linear-gradient(160deg, rgba(0, 180, 216, 0.16), rgba(6, 22, 34, 0.95));
+    }
+
+    .feature-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .feature-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(0, 242, 254, 0.14);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .feature-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #ffffff;
+    }
+
+    .feature-state-tag {
+      font-size: 0.72rem;
+      display: block;
+      color: var(--text-muted);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #122a3a;
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      transition: 0.25s;
+      border-radius: 34px;
+    }
+
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-muted);
+      transition: 0.25s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider-toggle {
+      background: linear-gradient(90deg, var(--aqua-deep), var(--aqua-primary));
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
+    }
+
+    input:checked + .slider-toggle:before {
+      transform: translateX(22px);
+      background-color: #021017;
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cyber-range {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: #0d2535;
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      outline: none;
+    }
+
+    .cyber-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--aqua-primary);
+      box-shadow: 0 0 10px var(--aqua-primary);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+
+    .range-value {
+      min-width: 38px;
+      text-align: right;
+      font-weight: 800;
+      color: var(--aqua-primary);
+      font-size: 0.95rem;
+    }
+
+    .optimizer-panel {
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.14), rgba(6, 22, 34, 0.94));
+      border: 1px solid var(--aqua-primary);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--border-glow);
+    }
+
+    .optimizer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .optimizer-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--aqua-primary);
+      letter-spacing: 1px;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .game-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(8, 28, 42, 0.9);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .game-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--aqua-primary);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.45);
+    }
+
+    .game-card:active {
+      transform: scale(0.98);
+    }
+
+    .game-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--aqua-primary), var(--aqua-deep));
+      color: #021017;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .hex-viewer {
+      font-family: monospace;
+      font-size: 0.78rem;
+      background: #020a10;
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      color: #72efdd;
+      max-height: 140px;
+      overflow-y: auto;
+      word-break: break-all;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="brand-header">
+      <h1 class="brand-title">Spf_Hoang</h1>
+      <span class="sim-badge" id="modeBadge">Hệ thống Điều khiển Cấu hình (Mô phỏng UI)</span>
+    </header>
+
+    <section id="pageKeyAuth" class="glass-panel">
+      <div class="contact-grid">
+        <a
+          href="https://zalo.me/g/ksgk8apm4fjloxyhvh39"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-action"
+        >
+          <span>BOX ZALO</span>
+          <span class="btn-subtext">Tham gia cộng đồng nhận hỗ trợ</span>
+        </a>
+
+        <a href="tel:0788686079" class="btn-action">
+          <span>📞LIÊN HỆ ADMIN QUANG HOANG</span>
+          <span class="btn-subtext">SĐT: 0788686079</span>
+        </a>
+      </div>
+
+      <div class="free-key-banner">Vào box nhận key FREE</div>
+
+      <form id="keyForm" class="key-input-group">
+        <input
+          type="text"
+          id="keyInput"
+          class="input-cyber"
+          placeholder="Nhập mã Key của bạn (VD: SPF-XXXXXX-XXXXXX-XXXXXX)"
+          autocomplete="off"
+          required
+        />
+        <button type="submit" id="btnVerifyKey" class="btn-action">
+          XÁC NHẬN &amp; TRUY CẬP
+        </button>
+      </form>
+
+      <div id="authStatusBox" class="status-box" style="margin-top: 14px;"></div>
+
+      <div class="demo-box">
+        <span>Chưa kết nối máy chủ Backend? Dùng chế độ xem thử giao diện:</span>
+        <button type="button" id="btnEnterDemo" class="btn-outline">
+          Mở Chế độ Demo (Giới hạn)
+        </button>
+      </div>
+    </section>
+
+    <section id="pageDashboard" class="hidden">
+      <div class="session-bar">
+        <div>
+          <strong>Trạng thái phiên:</strong>
+          <span id="sessionKeyText" style="color: var(--aqua-primary);">Đã xác thực</span>
+          <span id="sessionExpiryText" style="color: var(--text-muted); margin-left: 8px;"></span>
+        </div>
+        <button type="button" id="btnLogout" class="btn-outline">Đăng xuất Key</button>
+      </div>
+
+      <div class="glass-panel" style="padding: 14px 18px; font-size: 0.85rem; color: var(--text-muted);">
+        <strong style="color: var(--aqua-primary);">Trạng thái Kiểm tra Hệ thống &amp; Tương thích:</strong>
+        Các chức năng dưới đây hoạt động ở chế độ <em>mô phỏng cấu hình độc lập trên giao diện web</em>. Ứng dụng không can thiệp bộ nhớ trò chơi, không tiêm mã vào tiến trình và không vô hiệu hóa hệ thống chống gian lận.
+      </div>
+
+      <div id="featuresContainer" class="features-grid"></div>
+
+      <div class="optimizer-panel">
+        <div class="optimizer-header">
+          <div>
+            <div class="optimizer-title">Optimizer</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              Điều chỉnh tham số hiệu ứng mô phỏng &amp; lưu cấu hình người dùng
+            </div>
+          </div>
+          <div class="range-value" id="optimizerValueDisplay" style="font-size: 1.3rem;">50</div>
+        </div>
+        <div class="range-row">
+          <input
+            type="range"
+            id="optimizerSlider"
+            class="cyber-range"
+            min="0"
+            max="100"
+            value="50"
+          />
+        </div>
+      </div>
+
+      <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <strong style="color: var(--aqua-primary);">Trình Kiểm tra Tài liệu HEX Tham chiếu</strong>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              Chỉ đọc và xác minh tính toàn vẹn SHA-256 trên bản sao (Không thực thi trực tiếp)
+            </div>
+          </div>
+          <button type="button" id="btnInspectHex" class="btn-outline">Kiểm tra Toàn vẹn HEX</button>
+        </div>
+        <div id="hexInspectResult" class="hex-viewer hidden"></div>
+      </div>
+
+      <div class="glass-panel">
+        <h3 style="margin-bottom: 6px; color: var(--aqua-primary); font-size: 1rem;">
+          Khu vực Khởi chạy / Liên kết Trò chơi
+        </h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          Mở trang thông tin chính thức của ứng dụng trên kho ứng dụng tương thích với thiết bị.
+        </p>
+
+        <div class="game-grid">
+          <button type="button" class="game-card" id="btnLaunchFFNormal">
+            <div class="game-icon">FF</div>
+            <div>
+              <div style="font-weight: 800; font-size: 1rem;">FreeFire Thường</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">com.dts.freefireth</div>
+            </div>
+          </button>
+
+          <button type="button" class="game-card" id="btnLaunchFFMax">
+            <div class="game-icon">MAX</div>
+            <div>
+              <div style="font-weight: 800; font-size: 1rem;">FreeFireMax</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">com.dts.freefiremax</div>
+            </div>
+          </button>
+        </div>
+
+        <div id="gameLaunchMessage" class="status-box" style="margin-top: 12px;"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const FEATURE_DEFINITIONS = [
+      { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯', hexProfileId: 'CFG_HEX_01' },
+      { id: 'tang_nhay', name: 'Tăng Nhạy', icon: '⚡', hexProfileId: 'CFG_HEX_02' },
+      { id: 'buff_man', name: 'Buff Màn', icon: '📱', hexProfileId: 'CFG_HEX_03' },
+      { id: 'aim_lock', name: 'AimLock', icon: '🔒', hexProfileId: 'CFG_HEX_04' },
+      { id: 'head_lock', name: 'HeadLock', icon: '👑', hexProfileId: 'CFG_HEX_05' },
+      { id: 'bam_dau', name: 'Bám Đầu', icon: '🧲', hexProfileId: 'CFG_HEX_06' },
+      { id: 'dam_tam', name: 'Đầm Tâm', icon: '🛡️', hexProfileId: 'CFG_HEX_07' },
+      { id: 'fix_rung', name: 'Fix Rung', icon: '🎛️', hexProfileId: 'CFG_HEX_08' }
+    ];
+
+    const appState = {
+      isDemoMode: false,
+      sessionToken: null,
+      keyInfo: null,
+      optimizer: 50,
+      features: {}
+    };
+
+    FEATURE_DEFINITIONS.forEach(item => {
+      appState.features[item.id] = { enabled: false, value: 50 };
+    });
+
+    const pageKeyAuth = document.getElementById('pageKeyAuth');
+    const pageDashboard = document.getElementById('pageDashboard');
+    const authStatusBox = document.getElementById('authStatusBox');
+    const featuresContainer = document.getElementById('featuresContainer');
+    const optimizerSlider = document.getElementById('optimizerSlider');
+    const optimizerValueDisplay = document.getElementById('optimizerValueDisplay');
+
+    function showStatus(element, type, text) {
+      element.className = `status-box status-${type}`;
+      element.textContent = text;
+    }
+
+    function renderFeatureCards() {
+      featuresContainer.innerHTML = '';
+      FEATURE_DEFINITIONS.forEach(def => {
+        const current = appState.features[def.id] || { enabled: false, value: 50 };
+        const card = document.createElement('div');
+        card.className = `feature-card ${current.enabled ? 'active' : ''}`;
+        card.id = `card_${def.id}`;
+
+        card.innerHTML = `
+          <div class="feature-top">
+            <div class="feature-title-wrap">
+              <div class="feature-icon">${def.icon}</div>
+              <div>
+                <div class="feature-name">${def.name}</div>
+                <span class="feature-state-tag" id="tag_${def.id}">
+                  ${current.enabled ? 'Đang kích hoạt (Mô phỏng)' : 'Đang tắt'} • ${def.hexProfileId}
+                </span>
+              </div>
+            </div>
+            <label class="switch" aria-label="Bật tắt ${def.name}">
+              <input type="checkbox" data-feature-toggle="${def.id}" ${current.enabled ? 'checked' : ''} />
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+          <div class="range-row">
+            <input
+              type="range"
+              class="cyber-range"
+              min="0"
+              max="100"
+              value="${current.value}"
+              data-feature-slider="${def.id}"
+            />
+            <span class="range-value" id="val_${def.id}">${current.value}</span>
+          </div>
+        `;
+        featuresContainer.appendChild(card);
+      });
+
+      document.querySelectorAll('[data-feature-toggle]').forEach(toggle => {
+        toggle.addEventListener('change', e => {
+          const id = e.target.getAttribute('data-feature-toggle');
+          const enabled = e.target.checked;
+          appState.features[id].enabled = enabled;
+
+          const card = document.getElementById(`card_${id}`);
+          const tag = document.getElementById(`tag_${id}`);
+          const def = FEATURE_DEFINITIONS.find(d => d.id === id);
+
+          if (enabled) {
+            card.classList.add('active');
+            tag.textContent = `Đang kích hoạt (Mô phỏng) • ${def.hexProfileId}`;
+          } else {
+            card.classList.remove('active');
+            tag.textContent = `Đang tắt • ${def.hexProfileId}`;
+          }
+          persistConfiguration();
+        });
+      });
+
+      document.querySelectorAll('[data-feature-slider]').forEach(slider => {
+        slider.addEventListener('input', e => {
+          const id = e.target.getAttribute('data-feature-slider');
+          const val = Math.min(100, Math.max(0, Number(e.target.value)));
+          appState.features[id].value = val;
+          document.getElementById(`val_${id}`).textContent = val;
+        });
+        slider.addEventListener('change', () => persistConfiguration());
+      });
+    }
+
+    optimizerSlider.addEventListener('input', e => {
+      const val = Math.min(100, Math.max(0, Number(e.target.value)));
+      appState.optimizer = val;
+      optimizerValueDisplay.textContent = val;
+    });
+    optimizerSlider.addEventListener('change', () => persistConfiguration());
+
+    async function persistConfiguration() {
+      localStorage.setItem(
+        'spf_hoang_local_config',
+        JSON.stringify({ features: appState.features, optimizer: appState.optimizer })
+      );
+
+      if (appState.isDemoMode || !appState.sessionToken) return;
+
+      try {
+        await fetch('/api/client/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${appState.sessionToken}`
+          },
+          body: JSON.stringify({
+            features: appState.features,
+            optimizer: appState.optimizer
+          })
+        });
+      } catch {}
+    }
+
+    function openDashboardView() {
+      pageKeyAuth.classList.add('hidden');
+      pageDashboard.classList.remove('hidden');
+
+      const sessionKeyText = document.getElementById('sessionKeyText');
+      const sessionExpiryText = document.getElementById('sessionExpiryText');
+      const modeBadge = document.getElementById('modeBadge');
+
+      if (appState.isDemoMode) {
+        sessionKeyText.textContent = 'CHẾ ĐỘ DEMO (Chưa xác thực máy chủ)';
+        sessionExpiryText.textContent = '• Chỉ lưu cục bộ trên trình duyệt';
+        modeBadge.textContent = 'Chế độ Demo Giao diện — Không có kết nối Backend';
+      } else if (appState.keyInfo) {
+        sessionKeyText.textContent = `Key: ${appState.keyInfo.key} (${appState.keyInfo.durationLabel})`;
+        sessionExpiryText.textContent = appState.keyInfo.expiresAt
+          ? `• Hết hạn: ${new Date(appState.keyInfo.expiresAt).toLocaleString('vi-VN')}`
+          : '• Thời hạn: Vĩnh viễn';
+        modeBadge.textContent = 'Đã Xác thực Máy chủ — Chế độ Mô phỏng Cấu hình';
+      }
+
+      optimizerSlider.value = appState.optimizer;
+      optimizerValueDisplay.textContent = appState.optimizer;
+      renderFeatureCards();
+    }
+
+    document.getElementById('keyForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const rawKey = document.getElementById('keyInput').value.trim();
+      if (!rawKey) return;
+
+      showStatus(authStatusBox, 'loading', 'Đang xác minh key với máy chủ...');
+
+      try {
+        const res = await fetch('/api/client/verify-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: rawKey })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          showStatus(authStatusBox, 'error', data.message || 'Key không hợp lệ hoặc đã hết hạn.');
+          return;
+        }
+
+        appState.isDemoMode = false;
+        appState.sessionToken = data.sessionToken;
+        appState.keyInfo = data.keyInfo;
+
+        if (data.savedConfig) {
+          if (data.savedConfig.features) {
+            Object.assign(appState.features, data.savedConfig.features);
+          }
+          if (typeof data.savedConfig.optimizer === 'number') {
+            appState.optimizer = data.savedConfig.optimizer;
+          }
+        }
+
+        showStatus(authStatusBox, 'success', data.message);
+        setTimeout(() => openDashboardView(), 500);
+      } catch (err) {
+        showStatus(
+          authStatusBox,
+          'error',
+          'Không thể kết nối đến máy chủ xác thực. Hãy kiểm tra Backend hoặc dùng Chế độ Demo.'
+        );
+      }
+    });
+
+    document.getElementById('btnEnterDemo').addEventListener('click', () => {
+      appState.isDemoMode = true;
+      appState.sessionToken = null;
+      const cached = localStorage.getItem('spf_hoang_local_config');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.features) Object.assign(appState.features, parsed.features);
+          if (typeof parsed.optimizer === 'number') appState.optimizer = parsed.optimizer;
+        } catch {}
+      }
+      openDashboardView();
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      appState.sessionToken = null;
+      appState.keyInfo = null;
+      appState.isDemoMode = false;
+      authStatusBox.className = 'status-box';
+      pageDashboard.classList.add('hidden');
+      pageKeyAuth.classList.remove('hidden');
+    });
+
+    document.getElementById('btnInspectHex').addEventListener('click', async () => {
+      const box = document.getElementById('hexInspectResult');
+      box.classList.remove('hidden');
+
+      if (appState.isDemoMode) {
+        box.textContent =
+          '[CHẾ ĐỘ DEMO] Bản sao tham chiếu HEX: 4845585F5245464552454E4345... (Chỉ đọc, không thực thi trên trình duyệt).';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/client/hex-reference', {
+          headers: { Authorization: `Bearer ${appState.sessionToken}` }
+        });
+        const data = await res.json();
+        if (!data.success) {
+          box.textContent = data.message || 'Phiên đã hết hạn.';
+          return;
+        }
+        box.innerHTML = `
+          <div><strong>Định dạng HEX hợp lệ:</strong> ${data.integrity.isValidHex ? 'Có' : 'Không'}</div>
+          <div><strong>Kích thước:</strong> ${data.integrity.byteLength} bytes</div>
+          <div><strong>SHA-256:</strong> ${data.integrity.sha256}</div>
+          <div style="margin-top:6px;"><strong>Dữ liệu HEX gốc (Bản sao):</strong> ${data.rawHexPreview}</div>
+          <div style="margin-top:4px;"><strong>Giải mã văn bản (Bản sao đối chiếu):</strong> ${data.decodedPreview}</div>
+        `;
+      } catch {
+        box.textContent = 'Lỗi khi tải thông tin tham chiếu HEX từ máy chủ.';
+      }
+    });
+
+    function handleGameSelection(gameName, packageId) {
+      const msgBox = document.getElementById('gameLaunchMessage');
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const storeUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+
+      if (isMobile) {
+        showStatus(
+          msgBox,
+          'loading',
+          `Đang chuyển hướng tới trang ứng dụng chính thức của ${gameName} (${packageId}). Nếu trò chơi đã cài đặt, hãy chọn Mở từ cửa hàng.`
+        );
+        window.open(storeUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        showStatus(
+          msgBox,
+          'error',
+          `Trình duyệt máy tính không hỗ trợ khởi chạy trực tiếp gói ứng dụng di động (${packageId}). Vui lòng mở ${gameName} trực tiếp trên thiết bị di động của bạn.`
+        );
+      }
+    }
+
+    document.getElementById('btnLaunchFFNormal').addEventListener('click', () => {
+      handleGameSelection('FreeFire Thường', 'com.dts.freefireth');
+    });
+
+    document.getElementById('btnLaunchFFMax').addEventListener('click', () => {
+      handleGameSelection('FreeFireMax', 'com.dts.freefiremax');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Trị Key — Spf_Hoang Admin</title>
+  <style>
+    :root {
+      --bg-dark: #030a10;
+      --bg-panel: rgba(8, 26, 40, 0.88);
+      --aqua-main: #00f2fe;
+      --aqua-mid: #00b4d8;
+      --text-light: #e0fbfc;
+      --text-dim: #8ecae6;
+      --danger: #ff4d6d;
+      --success: #06d6a0;
+      --warning: #ffb703;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, #0a283e, var(--bg-dark) 75%);
+      color: var(--text-light);
+      min-height: 100vh;
+      padding: 20px 14px;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 18px 22px;
+      border-radius: 16px;
+      background: var(--bg-panel);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      box-shadow: 0 0 18px rgba(0, 242, 254, 0.25);
+      margin-bottom: 20px;
+    }
+
+    .title-glow {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--aqua-main);
+      text-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid rgba(0, 242, 254, 0.28);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .input-ctrl, .select-ctrl {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      background: #04131e;
+      color: var(--text-light);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .btn-primary {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      color: #021017;
+      background: linear-gradient(135deg, var(--aqua-main), var(--aqua-mid));
+      box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.75);
+    }
+
+    .btn-danger {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--danger);
+      background: rgba(255, 77, 109, 0.15);
+      color: #ff8fa3;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .new-key-banner {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px dashed var(--aqua-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .key-mono {
+      font-family: monospace;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--aqua-main);
+      letter-spacing: 1px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 242, 254, 0.15);
+      font-size: 0.9rem;
+    }
+
+    th {
+      color: var(--aqua-main);
+      font-weight: 700;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .badge-active {
+      background: rgba(6, 214, 160, 0.18);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .badge-expired {
+      background: rgba(255, 183, 3, 0.18);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .badge-revoked {
+      background: rgba(255, 77, 109, 0.18);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header-bar">
+      <div>
+        <div class="title-glow">Spf_Hoang — Quản Trị &amp; Cấp Phát Key</div>
+        <div style="font-size: 0.85rem; color: var(--text-dim);">
+          Hệ thống tạo, phân quyền thời hạn và thu hồi Key trực tuyến
+        </div>
+      </div>
+      <button id="btnAdminLogout" class="btn-danger hidden">Đăng xuất Admin</button>
+    </header>
+
+    <section id="loginSection" class="panel" style="max-width: 460px; margin: 40px auto;">
+      <h2 style="margin-bottom: 14px; color: var(--aqua-main);">Xác thực Quản trị viên</h2>
+      <form id="adminLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
+        <input
+          type="password"
+          id="adminPasswordInput"
+          class="input-ctrl"
+          placeholder="Nhập mật khẩu Quản trị viên..."
+          required
+        />
+        <button type="submit" class="btn-primary">ĐĂNG NHẬP HỆ THỐNG</button>
+      </form>
+      <div id="loginMsg" style="margin-top: 12px; font-size: 0.9rem; color: #ff8fa3;"></div>
+    </section>
+
+    <main id="adminDashboard" class="hidden">
+      <section class="panel">
+        <h3 style="margin-bottom: 12px; color: var(--aqua-main);">Tạo Key Mới</h3>
+        <div class="form-row">
+          <label for="durationSelect" style="font-weight: 600;">Thời hạn sử dụng:</label>
+          <select id="durationSelect" class="select-ctrl">
+            <option value="1h">1 giờ</option>
+            <option value="1d">1 ngày</option>
+            <option value="7d">7 ngày</option>
+            <option value="1m">1 tháng</option>
+            <option value="1y">1 năm</option>
+            <option value="forever">Vĩnh viễn</option>
+          </select>
+          <button type="button" id="btnGenerateKey" class="btn-primary">+ TẠO KEY NGẪU NHIÊN</button>
+        </div>
+
+        <div id="newlyCreatedBox" class="new-key-banner hidden">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-dim);">Key vừa khởi tạo:</div>
+            <div class="key-mono" id="newKeyValue">SPF-XXXXXX</div>
+            <div style="font-size: 0.82rem; margin-top: 4px;" id="newKeyMeta"></div>
+          </div>
+          <button type="button" id="btnCopyNewKey" class="btn-primary">SAO CHÉP KEY</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="form-row" style="justify-content: space-between; margin-bottom: 10px;">
+          <h3 style="color: var(--aqua-main);">Danh sách Key đã tạo</h3>
+          <div class="form-row">
+            <input
+              type="text"
+              id="searchKeyInput"
+              class="input-ctrl"
+              placeholder="Tìm mã key..."
+            />
+            <select id="filterStatusSelect" class="select-ctrl">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Còn hiệu lực</option>
+              <option value="expired">Hết hạn</option>
+              <option value="revoked">Đã thu hồi</option>
+            </select>
+            <button type="button" id="btnRefreshKeys" class="btn-primary">Làm mới</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã Key</th>
+                <th>Thời hạn chọn</th>
+                <th>Ngày tạo</th>
+                <th>Ngày hết hạn</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="keysTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let adminToken = sessionStorage.getItem('spf_admin_token') || null;
+    let allKeysCache = [];
+
+    const loginSection = document.getElementById('loginSection');
+    const adminDashboard = document.getElementById('adminDashboard');
+    const btnAdminLogout = document.getElementById('btnAdminLogout');
+    const keysTableBody = document.getElementById('keysTableBody');
+
+    function formatTime(ts) {
+      if (!ts) return 'Vĩnh viễn';
+      return new Date(ts).toLocaleString('vi-VN');
+    }
+
+    function renderStatusBadge(status) {
+      if (status === 'active') return '<span class="badge badge-active">Còn hiệu lực</span>';
+      if (status === 'expired') return '<span class="badge badge-expired">Hết hạn</span>';
+      return '<span class="badge badge-revoked">Đã thu hồi</span>';
+    }
+
+    function renderKeysTable() {
+      const keyword = document.getElementById('searchKeyInput').value.trim().toUpperCase();
+      const statusFilter = document.getElementById('filterStatusSelect').value;
+
+      const filtered = allKeysCache.filter(item => {
+        const matchWord = item.key.includes(keyword);
+        const matchStatus = statusFilter === 'all' || item.status === statusFilter;
+        return matchWord && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        keysTableBody.innerHTML =
+          '<tr><td colspan="6" style="text-align:center; color: var(--text-dim);">Không có key nào phù hợp.</td></tr>';
+        return;
+      }
+
+      keysTableBody.innerHTML = filtered
+        .map(
+          item => `
+        <tr>
+          <td style="font-family: monospace; font-weight: 700; color: var(--aqua-main);">${item.key}</td>
+          <td>${item.durationLabel}</td>
+          <td>${formatTime(item.createdAt)}</td>
+          <td>${formatTime(item.expiresAt)}</td>
+          <td>${renderStatusBadge(item.status)}</td>
+          <td>
+            <button type="button" class="btn-primary" style="padding:6px 10px; font-size:0.8rem;" onclick="copyKeyString('${item.key}')">Copy</button>
+            ${
+              item.status === 'active'
+                ? `<button type="button" class="btn-danger" onclick="revokeKeyById('${item.id}')">Thu hồi</button>`
+                : ''
+            }
+          </td>
+        </tr>
+      `
+        )
+        .join('');
+    }
+
+    async function fetchAdminKeys() {
+      if (!adminToken) return;
+      try {
+        const res = await fetch('/api/admin/keys', {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        if (res.status === 401) {
+          handleAdminLogout();
+          return;
+        }
+        const data = await res.json();
+        if (data.success) {
+          allKeysCache = data.keys;
+          renderKeysTable();
+        }
+      } catch {
+        alert('Không thể kết nối máy chủ Backend.');
+      }
+    }
+
+    function showAdminDashboard() {
+      loginSection.classList.add('hidden');
+      adminDashboard.classList.remove('hidden');
+      btnAdminLogout.classList.remove('hidden');
+      fetchAdminKeys();
+    }
+
+    function handleAdminLogout() {
+      adminToken = null;
+      sessionStorage.removeItem('spf_admin_token');
+      adminDashboard.classList.add('hidden');
+      btnAdminLogout.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+    }
+
+    document.getElementById('adminLoginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const password = document.getElementById('adminPasswordInput').value;
+      const loginMsg = document.getElementById('loginMsg');
+      loginMsg.textContent = 'Đang xác minh...';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          loginMsg.textContent = data.message || 'Đăng nhập thất bại.';
+          return;
+        }
+        adminToken = data.token;
+        sessionStorage.setItem('spf_admin_token', adminToken);
+        loginMsg.textContent = '';
+        showAdminDashboard();
+      } catch {
+        loginMsg.textContent = 'Lỗi kết nối Backend.';
+      }
+    });
+
+    document.getElementById('btnGenerateKey').addEventListener('click', async () => {
+      const durationCode = document.getElementById('durationSelect').value;
+      try {
+        const res = await fetch('/api/admin/keys/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ durationCode })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          alert(data.message);
+          return;
+        }
+        const k = data.keyData;
+        document.getElementById('newlyCreatedBox').classList.remove('hidden');
+        document.getElementById('newKeyValue').textContent = k.key;
+        document.getElementById('newKeyMeta').textContent = `Thời hạn: ${k.durationLabel} | Hết hạn: ${formatTime(k.expiresAt)}`;
+        fetchAdminKeys();
+      } catch {
+        alert('Lỗi khi tạo key mới.');
+      }
+    });
+
+    document.getElementById('btnCopyNewKey').addEventListener('click', () => {
+      const keyText = document.getElementById('newKeyValue').textContent;
+      copyKeyString(keyText);
+    });
+
+    window.copyKeyString = function (str) {
+      navigator.clipboard.writeText(str).then(() => {
+        alert(`Đã sao chép key: ${str}`);
+      });
+    };
+
+    window.revokeKeyById = async function (id) {
+      if (!confirm('Bạn có chắc chắn muốn thu hồi key này ngay lập tức?')) return;
+      try {
+        const res = await fetch('/api/admin/keys/revoke', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.success) fetchAdminKeys();
+      } catch {
+        alert('Không thể thu hồi key.');
+      }
+    };
+
+    document.getElementById('searchKeyInput').addEventListener('input', renderKeysTable);
+    document.getElementById('filterStatusSelect').addEventListener('change', renderKeysTable);
+    document.getElementById('btnRefreshKeys').addEventListener('click', fetchAdminKeys);
+    btnAdminLogout.addEventListener('click', handleAdminLogout);
+
+    if (adminToken) showAdminDashboard();
+  </script>
+</body>
+</html>
