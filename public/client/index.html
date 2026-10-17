@@ -875,33 +875,71 @@
       }
     });
 
-    function handleGameSelection(gameName, packageId) {
+// Xử lý mở thẳng vào ứng dụng Game trên iOS (iPhone/iPad) và Android
+    function handleGameSelection(gameType) {
       const msgBox = document.getElementById('gameLaunchMessage');
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const storeUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+      const ua = navigator.userAgent || '';
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const isAndroid = /Android/i.test(ua);
 
-      if (isMobile) {
+      const gameConfig = {
+        normal: {
+          name: 'FreeFire Thường',
+          packageId: 'com.dts.freefireth',
+          iosScheme: 'freefireth://',
+          iosStore: 'https://apps.apple.com/vn/app/id1300146617',
+          androidIntent: 'intent://#Intent;scheme=freefire;package=com.dts.freefireth;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.dts.freefireth;end'
+        },
+        max: {
+          name: 'FreeFireMax',
+          packageId: 'com.dts.freefiremax',
+          iosScheme: 'freefiremax://',
+          iosStore: 'https://apps.apple.com/vn/app/id1480516829',
+          androidIntent: 'intent://#Intent;scheme=freefiremax;package=com.dts.freefiremax;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.dts.freefiremax;end'
+        }
+      };
+
+      const target = gameConfig[gameType];
+
+      if (isIOS) {
         showStatus(
           msgBox,
           'loading',
-          `Đang chuyển hướng tới trang ứng dụng chính thức của ${gameName} (${packageId}). Nếu trò chơi đã cài đặt, hãy chọn Mở từ cửa hàng.`
+          `Đang mở trực tiếp ${target.name} trên iPhone... Hãy nhấn "Mở" (Open) nếu trình duyệt hỏi xác nhận.`
         );
-        window.open(storeUrl, '_blank', 'noopener,noreferrer');
+
+        // Gọi trực tiếp URL Scheme để bật thẳng ứng dụng game trên iOS
+        window.location.href = target.iosScheme;
+
+        // Nếu sau 2.5 giây vẫn ở lại trình duyệt (chưa cài game), chuyển sang App Store iOS
+        setTimeout(() => {
+          if (!document.hidden) {
+            window.location.href = target.iosStore;
+          }
+        }, 2500);
+      } else if (isAndroid) {
+        showStatus(
+          msgBox,
+          'loading',
+          `Đang khởi chạy trực tiếp ${target.name} (${target.packageId})...`
+        );
+        // Dùng Android Intent để mở thẳng app đã cài trên máy Android
+        window.location.href = target.androidIntent;
       } else {
         showStatus(
           msgBox,
           'error',
-          `Trình duyệt máy tính không hỗ trợ khởi chạy trực tiếp gói ứng dụng di động (${packageId}). Vui lòng mở ${gameName} trực tiếp trên thiết bị di động của bạn.`
+          `Bạn đang mở trên máy tính. Vui lòng truy cập web bằng điện thoại để mở trực tiếp ${target.name}.`
         );
       }
     }
 
     document.getElementById('btnLaunchFFNormal').addEventListener('click', () => {
-      handleGameSelection('FreeFire Thường', 'com.dts.freefireth');
+      handleGameSelection('normal');
     });
 
     document.getElementById('btnLaunchFFMax').addEventListener('click', () => {
-      handleGameSelection('FreeFireMax', 'com.dts.freefiremax');
+      handleGameSelection('max');
     });
   </script>
 </body>
