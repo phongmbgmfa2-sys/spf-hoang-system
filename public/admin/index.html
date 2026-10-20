@@ -32,7 +32,7 @@
     }
 
     .container {
-      max-width: 1080px;
+      max-width: 1120px;
       margin: 0 auto;
     }
 
@@ -104,6 +104,22 @@
       box-shadow: 0 0 20px rgba(0, 242, 254, 0.75);
     }
 
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .btn-warning {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--warning);
+      background: rgba(255, 183, 3, 0.15);
+      color: var(--warning);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
     .btn-danger {
       padding: 6px 12px;
       border-radius: 8px;
@@ -112,6 +128,7 @@
       color: #ff8fa3;
       cursor: pointer;
       font-weight: 600;
+      font-size: 0.8rem;
     }
 
     .btn-danger:hover {
@@ -138,6 +155,7 @@
       font-weight: 800;
       color: var(--aqua-main);
       letter-spacing: 1px;
+      user-select: all;
     }
 
     .table-wrap {
@@ -148,14 +166,14 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 680px;
+      min-width: 760px;
     }
 
     th, td {
       padding: 12px 10px;
       text-align: left;
       border-bottom: 1px solid rgba(0, 242, 254, 0.15);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
     th {
@@ -166,8 +184,9 @@
     .badge {
       padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
+      display: inline-block;
     }
 
     .badge-active {
@@ -195,7 +214,7 @@
       <div>
         <div class="title-glow">Spf_Hoang — Quản Trị &amp; Cấp Phát Key</div>
         <div style="font-size: 0.85rem; color: var(--text-dim);">
-          Hệ thống tạo, phân quyền thời hạn và thu hồi Key trực tuyến
+          Hệ thống tạo Key, khóa 1 thiết bị duy nhất và thu hồi trực tuyến
         </div>
       </div>
       <button id="btnAdminLogout" class="btn-danger hidden">Đăng xuất Admin</button>
@@ -218,7 +237,7 @@
 
     <main id="adminDashboard" class="hidden">
       <section class="panel">
-        <h3 style="margin-bottom: 12px; color: var(--aqua-main);">Tạo Key Mới</h3>
+        <h3 style="margin-bottom: 12px; color: var(--aqua-main);">Tạo Key Mới (1 Key = 1 Thiết bị)</h3>
         <div class="form-row">
           <label for="durationSelect" style="font-weight: 600;">Thời hạn sử dụng:</label>
           <select id="durationSelect" class="select-ctrl">
@@ -234,7 +253,7 @@
 
         <div id="newlyCreatedBox" class="new-key-banner hidden">
           <div>
-            <div style="font-size: 0.8rem; color: var(--text-dim);">Key vừa khởi tạo:</div>
+            <div style="font-size: 0.8rem; color: var(--text-dim);">Key vừa khởi tạo (Chạm để sao chép):</div>
             <div class="key-mono" id="newKeyValue">SPF-XXXXXX</div>
             <div style="font-size: 0.82rem; margin-top: 4px;" id="newKeyMeta"></div>
           </div>
@@ -267,8 +286,8 @@
             <thead>
               <tr>
                 <th>Mã Key</th>
-                <th>Thời hạn chọn</th>
-                <th>Ngày tạo</th>
+                <th>Thời hạn</th>
+                <th>Thiết bị ( tối đa 1 )</th>
                 <th>Ngày hết hạn</th>
                 <th>Trạng thái</th>
                 <th>Thao tác</th>
@@ -282,7 +301,8 @@
   </div>
 
   <script>
-    let adminToken = sessionStorage.getItem('spf_admin_token') || null;
+    // Lưu token vào localStorage để dùng trên điện thoại không bị mất khi đóng tab
+    let adminToken = localStorage.getItem('spf_admin_token') || null;
     let allKeysCache = [];
 
     const loginSection = document.getElementById('loginSection');
@@ -299,6 +319,13 @@
       if (status === 'active') return '<span class="badge badge-active">Còn hiệu lực</span>';
       if (status === 'expired') return '<span class="badge badge-expired">Hết hạn</span>';
       return '<span class="badge badge-revoked">Đã thu hồi</span>';
+    }
+
+    function renderDeviceCell(item) {
+      if (!item.deviceId) {
+        return '<span style="color: var(--text-dim);">Chưa gắn máy (0/1)</span>';
+      }
+      return `<span style="color: var(--aqua-main); font-weight: 600;">🔒 ${item.deviceName || 'Đã khóa'} (1/1)</span>`;
     }
 
     function renderKeysTable() {
@@ -323,11 +350,16 @@
         <tr>
           <td style="font-family: monospace; font-weight: 700; color: var(--aqua-main);">${item.key}</td>
           <td>${item.durationLabel}</td>
-          <td>${formatTime(item.createdAt)}</td>
+          <td>${renderDeviceCell(item)}</td>
           <td>${formatTime(item.expiresAt)}</td>
           <td>${renderStatusBadge(item.status)}</td>
-          <td>
+          <td style="display: flex; gap: 6px; flex-wrap: wrap;">
             <button type="button" class="btn-primary" style="padding:6px 10px; font-size:0.8rem;" onclick="copyKeyString('${item.key}')">Copy</button>
+            ${
+              item.deviceId && item.status === 'active'
+                ? `<button type="button" class="btn-warning" onclick="resetDeviceById('${item.id}')">Reset TB</button>`
+                : ''
+            }
             ${
               item.status === 'active'
                 ? `<button type="button" class="btn-danger" onclick="revokeKeyById('${item.id}')">Thu hồi</button>`
@@ -356,7 +388,7 @@
           renderKeysTable();
         }
       } catch {
-        alert('Không thể kết nối máy chủ Backend.');
+        // Bỏ qua lỗi mạng chập chờn trên di động
       }
     }
 
@@ -369,7 +401,7 @@
 
     function handleAdminLogout() {
       adminToken = null;
-      sessionStorage.removeItem('spf_admin_token');
+      localStorage.removeItem('spf_admin_token');
       adminDashboard.classList.add('hidden');
       btnAdminLogout.classList.add('hidden');
       loginSection.classList.remove('hidden');
@@ -393,16 +425,20 @@
           return;
         }
         adminToken = data.token;
-        sessionStorage.setItem('spf_admin_token', adminToken);
+        localStorage.setItem('spf_admin_token', adminToken);
         loginMsg.textContent = '';
         showAdminDashboard();
       } catch {
-        loginMsg.textContent = 'Lỗi kết nối Backend.';
+        loginMsg.textContent = 'Lỗi kết nối máy chủ. Hãy thử lại.';
       }
     });
 
     document.getElementById('btnGenerateKey').addEventListener('click', async () => {
+      const btn = document.getElementById('btnGenerateKey');
       const durationCode = document.getElementById('durationSelect').value;
+      btn.disabled = true;
+      btn.textContent = 'ĐANG TẠO KEY...';
+
       try {
         const res = await fetch('/api/admin/keys/create', {
           method: 'POST',
@@ -412,18 +448,28 @@
           },
           body: JSON.stringify({ durationCode })
         });
+
+        if (res.status === 401) {
+          alert('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!');
+          handleAdminLogout();
+          return;
+        }
+
         const data = await res.json();
         if (!data.success) {
-          alert(data.message);
+          alert(data.message || 'Không thể tạo key.');
           return;
         }
         const k = data.keyData;
         document.getElementById('newlyCreatedBox').classList.remove('hidden');
         document.getElementById('newKeyValue').textContent = k.key;
-        document.getElementById('newKeyMeta').textContent = `Thời hạn: ${k.durationLabel} | Hết hạn: ${formatTime(k.expiresAt)}`;
+        document.getElementById('newKeyMeta').textContent = `Thời hạn: ${k.durationLabel} | Hết hạn: ${formatTime(k.expiresAt)} | Giới hạn: 1 Thiết bị`;
         fetchAdminKeys();
       } catch {
-        alert('Lỗi khi tạo key mới.');
+        alert('Kết nối mạng đang bận, vui lòng bấm tạo lại sau vài giây.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '+ TẠO KEY NGẪU NHIÊN';
       }
     });
 
@@ -432,10 +478,50 @@
       copyKeyString(keyText);
     });
 
+    // Hỗ trợ sao chép Key mượt mà trên cả iPhone Safari và trình duyệt Zalo
     window.copyKeyString = function (str) {
-      navigator.clipboard.writeText(str).then(() => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(str).then(() => {
+          alert(`Đã sao chép key: ${str}`);
+        }).catch(() => fallbackCopy(str));
+      } else {
+        fallbackCopy(str);
+      }
+    };
+
+    function fallbackCopy(str) {
+      const ta = document.createElement('textarea');
+      ta.value = str;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
         alert(`Đã sao chép key: ${str}`);
-      });
+      } catch {
+        prompt('Sao chép mã Key dưới đây:', str);
+      }
+      document.body.removeChild(ta);
+    }
+
+    window.resetDeviceById = async function (id) {
+      if (!confirm('Mở khóa thiết bị để Key này có thể đăng nhập trên máy mới?')) return;
+      try {
+        const res = await fetch('/api/admin/keys/reset-device', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.success) fetchAdminKeys();
+      } catch {
+        alert('Không thể mở khóa thiết bị.');
+      }
     };
 
     window.revokeKeyById = async function (id) {
