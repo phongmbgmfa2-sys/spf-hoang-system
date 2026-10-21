@@ -15,19 +15,18 @@
       --text-muted: #8ecae6;
       --danger: #ff4d6d;
       --success: #06d6a0;
-      --warning: #ffb703;
       --border-glow: 0 0 14px rgba(0, 242, 254, 0.38);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: radial-gradient(circle at top, #0a2538 0%, var(--bg-dark) 75%); color: var(--text-main); min-height: 100vh; padding: 14px; }
-    .app-container { max-width: 780px; margin: 0 auto; }
+    .app-container { max-width: 760px; margin: 0 auto; }
     .brand-header { text-align: center; padding: 20px 12px; margin-bottom: 16px; border-radius: 18px; background: linear-gradient(145deg, rgba(0, 180, 216, 0.16), rgba(4, 13, 20, 0.94)); border: 1px solid rgba(0, 242, 254, 0.38); box-shadow: var(--border-glow); }
     .brand-title { font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 900; letter-spacing: 2px; background: linear-gradient(90deg, #fff, var(--aqua-primary), var(--aqua-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .sim-badge { display: inline-block; margin-top: 8px; padding: 4px 12px; font-size: 0.78rem; border-radius: 999px; background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.4); color: var(--aqua-primary); }
     .glass-panel { background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 16px; padding: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), var(--border-glow); margin-bottom: 16px; }
-    .section-title { font-size: 1rem; font-weight: 800; color: var(--aqua-primary); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.5px; }
-    .contact-grid, .features-grid, .game-grid, .headshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 580px) { .contact-grid, .features-grid, .game-grid, .headshot-grid { grid-template-columns: 1fr; } }
+    .section-title { font-size: 1rem; font-weight: 800; color: var(--aqua-primary); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; }
+    .contact-grid, .features-grid, .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 580px) { .contact-grid, .features-grid, .game-grid { grid-template-columns: 1fr; } }
     .btn-action { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; padding: 14px 16px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: #021017; background: linear-gradient(135deg, var(--aqua-primary), var(--aqua-secondary)); box-shadow: 0 0 16px rgba(0, 242, 254, 0.45); border: none; cursor: pointer; transition: 0.2s; text-align: center; }
     .btn-action:active { transform: scale(0.98); }
     .btn-subtext { font-size: 0.78rem; margin-top: 4px; color: #032b3a; font-weight: 600; }
@@ -38,7 +37,6 @@
     .status-error { display: block; background: rgba(255, 77, 109, 0.16); border: 1px solid var(--danger); color: #ff8fa3; }
     .status-success { display: block; background: rgba(6, 214, 160, 0.16); border: 1px solid var(--success); color: #52f2c2; }
     .btn-outline { background: rgba(0, 242, 254, 0.08); color: var(--aqua-primary); border: 1px solid rgba(0, 242, 254, 0.45); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.82rem; }
-    .btn-outline.active-preset { background: var(--aqua-primary); color: #021017; box-shadow: 0 0 12px var(--aqua-primary); }
     .hidden { display: none !important; }
     .session-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; padding: 12px 16px; border-radius: 12px; background: rgba(0, 119, 182, 0.22); border: 1px solid rgba(0, 242, 254, 0.35); font-size: 0.86rem; }
     .preset-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -49,7 +47,6 @@
     .feature-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(0, 242, 254, 0.14); border: 1px solid rgba(0, 242, 254, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
     .feature-name { font-weight: 700; font-size: 0.96rem; color: #fff; }
     .feature-state-tag { font-size: 0.72rem; display: block; color: var(--text-muted); }
-    .feature-hex-mini { margin-top: 8px; padding: 6px 8px; border-radius: 6px; background: rgba(2, 8, 13, 0.85); border: 1px solid rgba(0, 242, 254, 0.2); font-family: monospace; font-size: 0.68rem; color: #52f2c2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider-toggle { position: absolute; cursor: pointer; inset: 0; background-color: #122a3a; border: 1px solid rgba(0, 242, 254, 0.35); transition: 0.25s; border-radius: 34px; }
@@ -59,11 +56,7 @@
     .range-row { display: flex; align-items: center; gap: 10px; }
     .cyber-range { flex: 1; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 999px; background: #0d2535; border: 1px solid rgba(0, 242, 254, 0.3); outline: none; }
     .cyber-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--aqua-primary); box-shadow: 0 0 10px var(--aqua-primary); cursor: pointer; border: 2px solid #fff; }
-    .range-value { min-width: 36px; text-align: right; font-weight: 800; color: var(--aqua-primary); font-size: 0.92rem; }
-    .hs-card { padding: 14px; border-radius: 12px; background: rgba(4, 16, 26, 0.92); border: 1px solid rgba(0, 242, 254, 0.3); cursor: pointer; transition: 0.2s; }
-    .hs-card.selected { border-color: var(--success); box-shadow: 0 0 16px rgba(6, 214, 160, 0.4); background: linear-gradient(145deg, rgba(6, 214, 160, 0.14), rgba(4, 16, 26, 0.95)); }
-    .hex-preview-box { margin-top: 10px; padding: 10px; border-radius: 10px; background: #02080d; border: 1px solid rgba(0, 242, 254, 0.3); font-family: monospace; font-size: 0.74rem; color: #52f2c2; max-height: 95px; overflow-y: auto; word-break: break-all; line-height: 1.4; }
-    .terminal-log { margin-top: 12px; padding: 12px; border-radius: 10px; background: #01060a; border: 1px solid var(--aqua-primary); font-family: monospace; font-size: 0.8rem; color: var(--aqua-primary); line-height: 1.6; display: none; }
+    .range-value { min-width: 38px; text-align: right; font-weight: 800; color: var(--aqua-primary); font-size: 0.92rem; }
     .game-card { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; background: rgba(8, 28, 42, 0.9); border: 1px solid rgba(0, 242, 254, 0.4); color: var(--text-main); cursor: pointer; text-align: left; }
     .game-icon { width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(135deg, var(--aqua-primary), var(--aqua-deep)); color: #021017; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0; }
   </style>
@@ -72,7 +65,7 @@
   <div class="app-container">
     <header class="brand-header">
       <h1 class="brand-title">Spf_Hoang</h1>
-      <span class="sim-badge">Hệ thống Điều khiển VIP • Khóa 1 Thiết bị • Full 6 File HEX Chuyên Biệt</span>
+      <span class="sim-badge">Hệ thống Điều khiển VIP • Khóa 1 Thiết bị • Tối Ưu Tự Động Ngầm</span>
     </header>
 
     <!-- TRANG 1: NHẬP KEY -->
@@ -97,7 +90,7 @@
       <div id="authStatusBox" class="status-box"></div>
     </section>
 
-    <!-- TRANG 2: BẢNG ĐIỀU KHIỂN SAU KHI CÓ KEY -->
+    <!-- TRANG 2: BẢNG ĐIỀU KHIỂN CHÍNH (ĐÃ ẨN TOÀN BỘ MÃ HEX) -->
     <section id="pageDashboard" class="hidden">
       <div class="session-bar">
         <div>
@@ -107,45 +100,31 @@
         <button type="button" id="btnLogout" class="btn-outline">Đăng xuất</button>
       </div>
 
-      <!-- Chọn nhanh cấu hình -->
       <div class="preset-bar">
-        <button type="button" class="btn-outline" onclick="applyQuickPreset('vip')">🔥 Bật Full Chức Năng VIP (100%)</button>
-        <button type="button" class="btn-outline" onclick="applyQuickPreset('pro')">🎯 Chuẩn Kéo Tâm Đầm (85%)</button>
-        <button type="button" class="btn-outline" onclick="applyQuickPreset('reset')">🔄 Đặt lại mặc định</button>
+        <button type="button" class="btn-outline" onclick="applyQuickPreset('vip')">🔥 Bật Full VIP (100%)</button>
+        <button type="button" class="btn-outline" onclick="applyQuickPreset('pro')">🎯 Chuẩn Kéo Đầm (85%)</button>
+        <button type="button" class="btn-outline" onclick="applyQuickPreset('reset')">🔄 Mặc định</button>
       </div>
 
-      <!-- 8 Chức năng chính (Đã gắn từng file HEX riêng vào Tăng Nhạy, AimLock, Bám Đầu, HeadLock) -->
+      <!-- 8 Ô chức năng -->
       <div id="featuresContainer" class="features-grid" style="margin-bottom: 16px;"></div>
 
-      <!-- MÔ-ĐUN MÃ HEX HEADSHOT CHUYÊN BIỆT -->
+      <!-- Chỉnh DPI & Lực Hút + Optimizer -->
       <div class="glass-panel">
         <div class="section-title">
-          <span>💀 Mô-đun Mã HEX Headshot (V10 + 5.0 ☠️)</span>
-          <span style="font-size: 0.75rem; color: var(--success);" id="activeHexBadge">Đang nạp: Dual Lock</span>
-        </div>
-        <div class="headshot-grid">
-          <div class="hs-card" id="hsCard_v10" onclick="selectHeadshotHex('v10')">
-            <div style="font-weight: 800; color: var(--aqua-primary);">⚡ Infinity SensiLock V10</div>
-            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">
-              Core: SUPER LOCK HEAD V10 • Nhẹ tâm &amp; nhạy cảm ứng tốc độ cao
-            </div>
-          </div>
-
-          <div class="hs-card" id="hsCard_v5" onclick="selectHeadshotHex('v5')">
-            <div style="font-weight: 800; color: #ffb703;">☠️ TrickShotLock 5.0 Đặc Biệt</div>
-            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">
-              Core: TrickShot 5.0 • Khóa cổ &amp; ghim đầu tầm gần/xa ổn định
-            </div>
-          </div>
+          <span>🚀 Optimizer (Hiệu Năng Cao) &amp; Độ Nhạy</span>
+          <span id="optimizerValueDisplay">90%</span>
         </div>
 
-        <button type="button" class="btn-outline" id="hsCard_dual" style="width: 100%; margin-top: 10px; padding: 10px;" onclick="selectHeadshotHex('dual')">
-          🔥 KẾT HỢP CẢ 2 MÃ HEX (INFINITY V10 + TRICKSHOTLOCK 5.0 ☠️)
-        </button>
+        <div style="margin-bottom: 14px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
+            <span><strong>Hiệu Năng Cao (Optimizer):</strong></span>
+            <span id="optSubVal" style="color:var(--aqua-primary); font-weight:800;">90%</span>
+          </div>
+          <input type="range" id="optimizerSlider" class="cyber-range" style="width:100%;" min="0" max="100" value="90" />
+        </div>
 
-        <div class="hex-preview-box" id="hexRawDisplay"></div>
-
-        <div style="margin-top: 14px;">
+        <div style="margin-bottom: 14px;">
           <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
             <span><strong>Lực Hút Headshot:</strong></span>
             <span id="hsPowerVal" style="color:var(--aqua-primary); font-weight:800;">95%</span>
@@ -153,47 +132,29 @@
           <input type="range" id="hsPowerSlider" class="cyber-range" style="width:100%;" min="0" max="100" value="95" />
         </div>
 
-        <div style="margin-top: 12px;">
+        <div style="margin-bottom: 14px;">
           <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
-            <span><strong>DPI Cảm ứng (com.touch_dpi.scaler-response):</strong></span>
+            <span><strong>DPI Cảm ứng:</strong></span>
             <span id="dpiVal" style="color:var(--aqua-primary); font-weight:800;">960 DPI</span>
           </div>
           <input type="range" id="dpiSlider" class="cyber-range" style="width:100%;" min="400" max="1440" step="20" value="960" />
         </div>
-      </div>
 
-      <!-- Thanh trượt Optimizer (Gắn file Hiệu Năng Cao Ss2 2.hex) -->
-      <div class="glass-panel">
-        <div class="section-title">
-          <span>🚀 Optimizer — Hiệu Năng Cao Ss2 (HighPerformanceModeIOS)</span>
-          <span id="optimizerValueDisplay" style="font-size: 1.2rem;">90%</span>
-        </div>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">
-          Nạp trực tiếp từ tệp <strong>Hiệu Năng Cao Ss2 2.hex</strong> (<code>BGTaskScheduler</code> + <code>enableScreenKeepAlive</code> + <code>qos: .userInitiated</code>).
-        </p>
-        <div class="range-row" style="margin-bottom: 10px;">
-          <input type="range" id="optimizerSlider" class="cyber-range" min="0" max="100" value="90" />
-        </div>
-        <div class="hex-preview-box" id="optimizerHexBox"></div>
-
-        <button type="button" id="btnInjectHex" class="btn-action" style="width: 100%; margin-top: 14px;">
-          ⚡ KÍCH HOẠT TOÀN BỘ MÃ HEX &amp; LƯU CẤU HÌNH
+        <button type="button" id="btnApplyAll" class="btn-action" style="width: 100%;">
+          ⚡ LƯU &amp; ÁP DỤNG CẤU HÌNH VÀO GAME
         </button>
-        <div id="terminalBox" class="terminal-log"></div>
+        <div id="applyStatusBox" class="status-box"></div>
       </div>
 
-      <!-- Khu vực mở thẳng vào Game -->
+      <!-- Mở thẳng vào Game -->
       <div class="glass-panel">
-        <div class="section-title"><span>🎮 Khởi Chạy Trò Chơi (Vào Thẳng Game)</span></div>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
-          Sau khi kích hoạt mã HEX, bấm chọn phiên bản bên dưới để mở thẳng vào game:
-        </p>
+        <div class="section-title"><span>🎮 Vào Thẳng Game</span></div>
         <div class="game-grid">
           <button type="button" class="game-card" id="btnLaunchFFNormal">
             <div class="game-icon">FF</div>
             <div>
               <div style="font-weight: 800;">FreeFire Thường</div>
-              <div style="font-size: 0.76rem; color: var(--text-muted);">Mở thẳng App + Nạp 6 File HEX</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Áp dụng ngầm &amp; Mở Game</div>
             </div>
           </button>
 
@@ -201,7 +162,7 @@
             <div class="game-icon">MAX</div>
             <div>
               <div style="font-weight: 800;">FreeFireMax</div>
-              <div style="font-size: 0.76rem; color: var(--text-muted);">Mở thẳng App + Nạp 6 File HEX</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Áp dụng ngầm &amp; Mở Game</div>
             </div>
           </button>
         </div>
@@ -211,137 +172,22 @@
   </div>
 
   <script>
-    // KHO DỮ LIỆU MÃ HEX TRÍCH XUẤT TỪ CÁC TỆP CỦA BẠN
-    const HEX_DATABASE = {
-      // 1. Tệp Aimlock Ver 11.hex -> gắn vào AimLock
-      aimlock_v11: {
-        fileName: 'Aimlock Ver 11.hex',
-        desc: 'A11yButtonController • com.aim_assist.auto-lock-speedboost.ips • com.auto_targeting.lock-on-fastmode.dat',
-        rawHex:
-          '25 32 35 32 35 32 35 32 35 32 35 32 35 32 35 32 35 32 35 32 35 32 35 32 46 2A 25 32 35 32 ' +
-          '63 6F 6D 2E 61 64 73 5F 73 65 6E 73 69 74 69 76 69 74 79 2E 68 69 67 68 73 70 65 65 64 2D 63 6F 6E 74 72 6F 6C 2E 74 6F 6F 6C 2E 64 61 74 ' +
-          '63 6F 6D 2E 74 6F 75 63 68 5F 72 65 73 70 6F 6E 73 65 2E 68 69 67 68 70 72 65 63 69 73 69 6F 6E 2D 65 6E 68 61 6E 63 65 72 2E 70 6C 69 73 74 ' +
-          '63 6F 6D 2E 61 69 6D 5F 61 73 73 69 73 74 2E 61 75 74 6F 2D 6C 6F 63 6B 2D 73 70 65 65 64 62 6F 6F 73 74 2E 69 70 73 ' +
-          '63 6F 6D 2E 63 72 6F 73 73 68 61 69 72 5F 74 72 61 63 6B 69 6E 67 2E 73 74 61 62 69 6C 69 7A 65 72 2D 65 6E 61 62 6C 65 2E 6C 69 73 74 ' +
-          '63 6F 6D 2E 61 75 74 6F 5F 74 61 72 67 65 74 69 6E 67 2E 6C 6F 63 6B 2D 6F 6E 2D 66 61 73 74 6D 6F 64 65 2E 64 61 74'
-      },
-
-      // 2. Tệp ghìm chặt ss3 2.hex -> gắn vào Bám Đầu
-      ghim_chat_ss3: {
-        fileName: 'ghìm chặt ss3 2.hex',
-        desc: 'Vector2 smoothAim • Recoil Exponential Decay • Alpha Target Smoothing',
-        rawHex:
-          '2F 2F 20 73 68 6F 6F 74 69 6E 67 5F 72 61 6E 67 65 2E 63 70 70 0A 2F 2F 20 43 6F 6D 70 69 6C 65 3A 20 67 2B 2B 20 ' +
-          '73 74 72 75 63 74 20 50 6C 61 79 65 72 20 7B 20 56 65 63 74 6F 72 32 20 61 69 6D 3B 20 56 65 63 74 6F 72 32 20 73 6D 6F 6F 74 68 41 69 6D 3B ' +
-          '72 65 63 6F 69 6C 20 3D 20 72 65 63 6F 69 6C 20 2A 20 73 74 64 3A 3A 70 6F 77 28 30 2E 32 2C 20 64 74 2A 36 30 2E 30 29 3B ' +
-          '64 6F 75 62 6C 65 20 61 6C 70 68 61 20 3D 20 31 2E 30 20 2D 20 73 74 64 3A 3A 70 6F 77 28 31 2E 30 20 2D 20 73 6D 6F 6F 74 68 69 6E 67 2C 20 64 74 2A 36 30 2E 30 29 3B'
-      },
-
-      // 3. Tệp Hiệu Năng Cao Ss2 2.hex -> gắn vào Optimizer
-      hieu_nang_cao_ss2: {
-        fileName: 'Hiệu Năng Cao Ss2 2.hex',
-        desc: 'HighPerformanceModeIOS • BGTaskScheduler • enableScreenKeepAlive • qos: .userInitiated',
-        rawHex:
-          '69 6D 70 6F 72 74 20 55 49 4B 69 74 0A 69 6D 70 6F 72 74 20 42 61 63 6B 67 72 6F 75 6E 64 54 61 73 6B 73 0A 0A ' +
-          '66 69 6E 61 6C 20 63 6C 61 73 73 20 48 69 67 68 50 65 72 66 6F 72 6D 61 6E 63 65 4D 6F 64 65 49 4F 53 20 7B ' +
-          '42 47 54 61 73 6B 53 63 68 65 64 75 6C 65 72 2E 73 68 61 72 65 64 2E 72 65 67 69 73 74 65 72 ' +
-          '55 49 41 70 70 6C 69 63 61 74 69 6F 6E 2E 73 68 61 72 65 64 2E 69 73 49 64 6C 65 54 69 6D 65 72 44 69 73 61 62 6C 65 64 20 3D 20 74 72 75 65 ' +
-          '44 69 73 70 61 74 63 68 51 75 65 75 65 2E 67 6C 6F 62 61 6C 28 71 6F 73 3A 20 2E 75 73 65 72 49 6E 69 74 69 61 74 65 64 29'
-      },
-
-      // 4. Tệp Nhay_x18_Supper_Ver_10.hex -> gắn vào Tăng Nhạy
-      nhay_x18_v10: {
-        fileName: 'Nhay_x18_Supper_Ver_10.hex',
-        desc: 'Super Sensitivity x18 Ver 10 • Touch Multiplier Booster',
-        rawHex:
-          '44 5A 65 31 74 65 56 41 45 41 55 44 6B 69 45 6D 59 77 30 78 4D 7A 33 4A 45 7A 4D 54 52 4C 38 2F ' +
-          '67 6A 6B 4E 74 37 71 47 44 32 73 59 58 68 4E 47 34 47 2B 48 63 61 6E 31 64 6C 4C 73 68 45 62 70 ' +
-          '78 4D 2B 38 75 67 44 48 69 35 4D 66 48 45 4C 76 54 31 56 35 4F 76 6D 63 65 6E 32 79 72 6E 33 5A ' +
-          '6F 37 73 39 42 64 42 61 39 65 73 50 4E 74 68 4B 4B 55 32 64 4C 4E 66 78 52 59 35 74 67 44 71 4F'
-      },
-
-      // 5. Infinity SensiLock V10
-      v10: {
-        fileName: 'Infinity SensiLock V10 2.hex',
-        rawHex:
-          '4D 44 63 77 4E 7A 41 33 4D 44 41 77 4D 44 41 77 4D 44 41 77 4D 44 41 77 4D 54 41 77 4E 6A 51 30 ' +
-          '41 41 41 41 55 31 56 51 52 56 49 67 54 45 39 44 53 79 42 49 52 55 46 45 49 46 59 78 4D 43 35 30 65 48 51 7A'
-      },
-
-      // 6. TrickShotLock 5.0
-      v5: {
-        fileName: 'TrickShotLock 5.0 Ver Đặc Biệt ☠️ 2.hex',
-        rawHex:
-          '4D 44 63 77 4E 7A 41 33 4D 44 41 77 4D 44 41 77 4D 44 41 77 4D 44 41 77 4D 54 41 77 4E 6A 51 30 ' +
-          '4D 54 55 77 4D 54 41 32 4E 54 55 33 4D 6A 63 77 4D 44 41 77 4E 54 51 77 4D 44 41 78 4D 7A 41 33'
-      }
-    };
-
-    // DANH SÁCH 8 CHỨC NĂNG ĐÃ ĐƯỢC GẮN ĐÚNG TỆP HEX THEO YÊU CẦU
+    // Cấu hình xử lý ngầm hoàn toàn (không hiện mã HEX ra màn hình)
     const FEATURE_DEFINITIONS = [
-      {
-        id: 'nhe_tam',
-        name: 'Nhẹ Tâm',
-        icon: '🎯',
-        hexProfileId: 'Infinity SensiLock V10',
-        hexSnippet: HEX_DATABASE.v10.rawHex
-      },
-      {
-        id: 'tang_nhay',
-        name: 'Tăng Nhạy (Nhạy x18 V10)',
-        icon: '⚡',
-        hexProfileId: 'Nhay_x18_Supper_Ver_10.hex',
-        hexSnippet: HEX_DATABASE.nhay_x18_v10.rawHex
-      },
-      {
-        id: 'buff_man',
-        name: 'Buff Màn',
-        icon: '📱',
-        hexProfileId: 'com.dpi_touch_control.ultra',
-        hexSnippet: HEX_DATABASE.aimlock_v11.rawHex
-      },
-      {
-        id: 'aim_lock',
-        name: 'AimLock (Aimlock Ver 11)',
-        icon: '🔒',
-        hexProfileId: 'Aimlock Ver 11.hex',
-        hexSnippet: HEX_DATABASE.aimlock_v11.rawHex
-      },
-      {
-        id: 'head_lock',
-        name: 'HeadLock V10 ☠️',
-        icon: '👑',
-        hexProfileId: 'SUPER_LOCK_HEAD_V10',
-        hexSnippet: HEX_DATABASE.v10.rawHex
-      },
-      {
-        id: 'bam_dau',
-        name: 'Bám Đầu (Ghìm Chặt SS3)',
-        icon: '🧲',
-        hexProfileId: 'ghìm chặt ss3 2.hex',
-        hexSnippet: HEX_DATABASE.ghim_chat_ss3.rawHex
-      },
-      {
-        id: 'dam_tam',
-        name: 'Đầm Tâm',
-        icon: '🛡️',
-        hexProfileId: 'TrickShotLock 5.0 ☠️',
-        hexSnippet: HEX_DATABASE.v5.rawHex
-      },
-      {
-        id: 'fix_rung',
-        name: 'Fix Rung Đầu',
-        icon: '🎛️',
-        hexProfileId: 'Recoil Decay 60Hz',
-        hexSnippet: HEX_DATABASE.ghim_chat_ss3.rawHex
-      }
+      { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯', sub: 'SensiLock V10' },
+      { id: 'tang_nhay', name: 'Tăng Nhạy (x18)', icon: '⚡', sub: 'Super Sensitivity x18' },
+      { id: 'buff_man', name: 'Buff Màn', icon: '📱', sub: 'Touch Response Ultra' },
+      { id: 'aim_lock', name: 'AimLock', icon: '🔒', sub: 'Aimlock Ver 11' },
+      { id: 'head_lock', name: 'HeadLock ☠️', icon: '👑', sub: 'Super Lock Head V10' },
+      { id: 'bam_dau', name: 'Bám Đầu (Ghìm Chặt)', icon: '🧲', sub: 'Ghìm Chặt SS3' },
+      { id: 'dam_tam', name: 'Đầm Tâm', icon: '🛡️', sub: 'TrickShotLock 5.0' },
+      { id: 'fix_rung', name: 'Fix Rung Đầu', icon: '🎛️', sub: 'Stabilizer Recoil' }
     ];
 
     const appState = {
       sessionToken: null,
       keyInfo: null,
       optimizer: 90,
-      headshotMode: 'dual',
       headshotPower: 95,
       dpi: 960,
       features: {}
@@ -354,7 +200,7 @@
     function getDeviceIdentity() {
       let savedId = localStorage.getItem('spf_unique_device_id');
       if (!savedId) {
-        const raw = [navigator.platform, screen.width + 'x' + screen.height, Intl.DateTimeFormat().resolvedOptions().timeZone, Date.now()].join('|');
+        const raw = [navigator.platform, screen.width + 'x' + screen.height, Date.now()].join('|');
         let hash = 0;
         for (let i = 0; i < raw.length; i++) hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0;
         savedId = 'DEV-' + Math.abs(hash).toString(16).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -374,15 +220,11 @@
     const featuresContainer = document.getElementById('featuresContainer');
     const optimizerSlider = document.getElementById('optimizerSlider');
     const optimizerValueDisplay = document.getElementById('optimizerValueDisplay');
-    const optimizerHexBox = document.getElementById('optimizerHexBox');
+    const optSubVal = document.getElementById('optSubVal');
 
     function showStatus(el, type, text) {
       el.className = `status-box status-${type}`;
       el.textContent = text;
-    }
-
-    function updateOptimizerHexPreview() {
-      optimizerHexBox.textContent = `[${HEX_DATABASE.hieu_nang_cao_ss2.fileName} • Mức ${appState.optimizer}%] >> ${HEX_DATABASE.hieu_nang_cao_ss2.rawHex}`;
     }
 
     function renderFeatureCards() {
@@ -399,7 +241,7 @@
               <div>
                 <div class="feature-name">${def.name}</div>
                 <span class="feature-state-tag" id="tag_${def.id}">
-                  ${cur.enabled ? 'Đang nạp:' : 'Đã tắt:'} ${def.hexProfileId}
+                  ${cur.enabled ? 'Đang bật' : 'Đang tắt'} • ${def.sub}
                 </span>
               </div>
             </div>
@@ -412,9 +254,6 @@
             <input type="range" class="cyber-range" min="0" max="100" value="${cur.value}" data-feature-slider="${def.id}" />
             <span class="range-value" id="val_${def.id}">${cur.value}%</span>
           </div>
-          <div class="feature-hex-mini" id="hexmini_${def.id}">
-            ${cur.enabled ? `[HEX] ${def.hexSnippet}` : '[HEX] Đang chờ kích hoạt...'}
-          </div>
         `;
         featuresContainer.appendChild(card);
       });
@@ -426,8 +265,7 @@
           appState.features[id].enabled = en;
           const def = FEATURE_DEFINITIONS.find(d => d.id === id);
           document.getElementById(`card_${id}`).classList.toggle('active', en);
-          document.getElementById(`tag_${id}`).textContent = `${en ? 'Đang nạp:' : 'Đã tắt:'} ${def.hexProfileId}`;
-          document.getElementById(`hexmini_${id}`).textContent = en ? `[HEX] ${def.hexSnippet}` : '[HEX] Đang chờ kích hoạt...';
+          document.getElementById(`tag_${id}`).textContent = `${en ? 'Đang bật' : 'Đang tắt'} • ${def.sub}`;
           persistConfiguration();
         });
       });
@@ -442,30 +280,6 @@
         s.addEventListener('change', () => persistConfiguration());
       });
     }
-
-    window.selectHeadshotHex = function (mode) {
-      appState.headshotMode = mode;
-      document.getElementById('hsCard_v10').classList.toggle('selected', mode === 'v10');
-      document.getElementById('hsCard_v5').classList.toggle('selected', mode === 'v5');
-      document.getElementById('hsCard_dual').classList.toggle('active-preset', mode === 'dual');
-
-      const hexDisplay = document.getElementById('hexRawDisplay');
-      const badge = document.getElementById('activeHexBadge');
-
-      if (mode === 'v10') {
-        badge.textContent = 'Đang nạp: SensiLock V10';
-        hexDisplay.textContent = `[Infinity SensiLock V10.hex] >> ${HEX_DATABASE.v10.rawHex}`;
-      } else if (mode === 'v5') {
-        badge.textContent = 'Đang nạp: TrickShot 5.0 ☠️';
-        hexDisplay.textContent = `[TrickShotLock 5.0 Đặc Biệt.hex] >> ${HEX_DATABASE.v5.rawHex}`;
-      } else {
-        badge.textContent = 'Đang nạp: Dual V10 + 5.0 ☠️';
-        hexDisplay.textContent =
-          `[1. Infinity SensiLock V10] >> ${HEX_DATABASE.v10.rawHex}\n` +
-          `[2. TrickShotLock 5.0 ☠️] >> ${HEX_DATABASE.v5.rawHex}`;
-      }
-      persistConfiguration();
-    };
 
     window.applyQuickPreset = function (type) {
       FEATURE_DEFINITIONS.forEach(d => {
@@ -485,9 +299,9 @@
       });
       optimizerSlider.value = appState.optimizer;
       optimizerValueDisplay.textContent = appState.optimizer + '%';
+      optSubVal.textContent = appState.optimizer + '%';
       document.getElementById('hsPowerSlider').value = appState.headshotPower;
       document.getElementById('hsPowerVal').textContent = appState.headshotPower + '%';
-      updateOptimizerHexPreview();
       renderFeatureCards();
       persistConfiguration();
     };
@@ -507,7 +321,7 @@
     optimizerSlider.addEventListener('input', e => {
       appState.optimizer = Number(e.target.value);
       optimizerValueDisplay.textContent = appState.optimizer + '%';
-      updateOptimizerHexPreview();
+      optSubVal.textContent = appState.optimizer + '%';
     });
     optimizerSlider.addEventListener('change', () => persistConfiguration());
 
@@ -523,16 +337,9 @@
           body: JSON.stringify({
             features: {
               ...appState.features,
-              _headshotHex: {
-                mode: appState.headshotMode,
+              _bgSettings: {
                 power: appState.headshotPower,
-                dpi: appState.dpi,
-                boundFiles: {
-                  aim_lock: 'Aimlock Ver 11.hex',
-                  bam_dau: 'ghìm chặt ss3 2.hex',
-                  optimizer: 'Hiệu Năng Cao Ss2 2.hex',
-                  tang_nhay: 'Nhay_x18_Supper_Ver_10.hex'
-                }
+                dpi: appState.dpi
               }
             },
             optimizer: appState.optimizer
@@ -541,19 +348,13 @@
       } catch {}
     }
 
-    document.getElementById('btnInjectHex').addEventListener('click', async () => {
-      const term = document.getElementById('terminalBox');
-      term.style.display = 'block';
-      term.innerHTML = `<div>[1/5] Đang nạp Aimlock Ver 11.hex vào AimLock (${appState.features.aim_lock.value}%)...</div>`;
-      await new Promise(r => setTimeout(r, 280));
-      term.innerHTML += `<div>[2/5] Đang nạp ghìm chặt ss3 2.hex vào Bám Đầu (${appState.features.bam_dau.value}%)...</div>`;
-      await new Promise(r => setTimeout(r, 280));
-      term.innerHTML += `<div>[3/5] Đang nạp Nhay_x18_Supper_Ver_10.hex vào Tăng Nhạy (${appState.features.tang_nhay.value}%)...</div>`;
-      await new Promise(r => setTimeout(r, 280));
-      term.innerHTML += `<div>[4/5] Đang nạp Hiệu Năng Cao Ss2 2.hex vào Optimizer (${appState.optimizer}%) &amp; Headshot V10/5.0...</div>`;
+    document.getElementById('btnApplyAll').addEventListener('click', async () => {
+      const box = document.getElementById('applyStatusBox');
+      showStatus(box, 'loading', 'Đang áp dụng ngầm AimLock, Ghìm Chặt, Nhạy x18 & Hiệu Năng Cao...');
       await persistConfiguration();
-      await new Promise(r => setTimeout(r, 280));
-      term.innerHTML += '<div style="color: var(--success); font-weight:800;">[5/5] ✔ ĐÃ ĐỒNG BỘ TẤT CẢ 6 FILE MÃ HEX THÀNH CÔNG! Hãy bấm chọn FreeFire bên dưới để vào game.</div>';
+      setTimeout(() => {
+        showStatus(box, 'success', '✔ Đã áp dụng toàn bộ cấu hình thành công! Hãy bấm chọn FreeFire bên dưới để vào game.');
+      }, 400);
     });
 
     function openDashboardView() {
@@ -567,9 +368,8 @@
       }
       optimizerSlider.value = appState.optimizer;
       optimizerValueDisplay.textContent = appState.optimizer + '%';
-      updateOptimizerHexPreview();
+      optSubVal.textContent = appState.optimizer + '%';
       renderFeatureCards();
-      selectHeadshotHex(appState.headshotMode || 'dual');
     }
 
     document.getElementById('keyForm').addEventListener('submit', async e => {
@@ -577,7 +377,7 @@
       const rawKey = document.getElementById('keyInput').value.trim();
       if (!rawKey) return;
       const { deviceId, deviceName } = getDeviceIdentity();
-      showStatus(authStatusBox, 'loading', 'Đang xác thực Key & Thiết bị...');
+      showStatus(authStatusBox, 'loading', 'Đang kiểm tra Key...');
 
       try {
         const res = await fetch('/api/client/verify-key', {
@@ -593,19 +393,18 @@
         appState.sessionToken = data.sessionToken;
         appState.keyInfo = data.keyInfo;
         if (data.savedConfig && data.savedConfig.features) {
-          const { _headshotHex, ...rest } = data.savedConfig.features;
+          const { _bgSettings, ...rest } = data.savedConfig.features;
           Object.assign(appState.features, rest);
-          if (_headshotHex) {
-            appState.headshotMode = _headshotHex.mode || 'dual';
-            appState.headshotPower = _headshotHex.power ?? 95;
-            appState.dpi = _headshotHex.dpi ?? 960;
+          if (_bgSettings) {
+            appState.headshotPower = _bgSettings.power ?? 95;
+            appState.dpi = _bgSettings.dpi ?? 960;
           }
           if (typeof data.savedConfig.optimizer === 'number') {
             appState.optimizer = data.savedConfig.optimizer;
           }
         }
         showStatus(authStatusBox, 'success', data.message);
-        setTimeout(() => openDashboardView(), 350);
+        setTimeout(() => openDashboardView(), 300);
       } catch {
         showStatus(authStatusBox, 'error', 'Không thể kết nối máy chủ.');
       }
@@ -623,22 +422,18 @@
       const isIOS = /iPhone|iPad|iPod/i.test(ua);
       const isAndroid = /Android/i.test(ua);
 
-      const hexCfgParam = encodeURIComponent(
-        `aim=v11_${appState.features.aim_lock.value}&bamdau=ss3_${appState.features.bam_dau.value}&nhay=x18_${appState.features.tang_nhay.value}&opt=ss2_${appState.optimizer}&hs=${appState.headshotMode}`
-      );
-
       const gameConfig = {
         normal: {
           name: 'FreeFire Thường',
-          iosScheme: `freefireth://?spf_hex=${hexCfgParam}`,
+          iosScheme: 'freefireth://',
           iosStore: 'https://apps.apple.com/vn/app/id1300146617',
-          androidIntent: `intent://?spf_hex=${hexCfgParam}#Intent;scheme=freefire;package=com.dts.freefireth;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.dts.freefireth;end`
+          androidIntent: 'intent://#Intent;scheme=freefire;package=com.dts.freefireth;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.dts.freefireth;end'
         },
         max: {
           name: 'FreeFireMax',
-          iosScheme: `freefiremax://?spf_hex=${hexCfgParam}`,
+          iosScheme: 'freefiremax://',
           iosStore: 'https://apps.apple.com/vn/app/id1480516829',
-          androidIntent: `intent://?spf_hex=${hexCfgParam}#Intent;scheme=freefiremax;package=com.dts.freefiremax;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.dts.freefiremax;end`
+          androidIntent: 'intent://#Intent;scheme=freefiremax;package=com.dts.freefiremax;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.dts.freefiremax;end'
         }
       };
 
@@ -646,21 +441,22 @@
       persistConfiguration();
 
       if (isIOS) {
-        showStatus(msgBox, 'loading', `Đang nạp Aimlock V11 + Ghìm Chặt SS3 + Nhạy x18 + Hiệu Năng Cao SS2 và mở ${target.name}...`);
+        showStatus(msgBox, 'loading', `Đang áp dụng cấu hình ngầm và mở ${target.name}...`);
         window.location.href = target.iosScheme;
         setTimeout(() => {
           if (!document.hidden) window.location.href = target.iosStore;
         }, 2500);
       } else if (isAndroid) {
-        showStatus(msgBox, 'loading', `Đang nạp toàn bộ gói HEX và khởi chạy ${target.name}...`);
+        showStatus(msgBox, 'loading', `Đang áp dụng cấu hình ngầm và mở ${target.name}...`);
         window.location.href = target.androidIntent;
       } else {
-        showStatus(msgBox, 'success', `Đã lưu cấu hình Aimlock V11, Ghìm Chặt SS3, Nhạy x18 & Hiệu Năng Cao SS2! Hãy mở web trên điện thoại để vào thẳng ${target.name}.`);
+        showStatus(msgBox, 'success', `Đã áp dụng toàn bộ cấu hình! Hãy mở trên điện thoại để vào thẳng ${target.name}.`);
       }
     }
 
     document.getElementById('btnLaunchFFNormal').addEventListener('click', () => handleGameSelection('normal'));
     document.getElementById('btnLaunchFFMax').addEventListener('click', () => handleGameSelection('max'));
+    setInterval(() => fetch('/api/ping').catch(() => {}), 300000);
   </script>
 </body>
 </html>

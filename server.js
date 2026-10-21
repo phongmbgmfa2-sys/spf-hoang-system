@@ -1,391 +1,234 @@
-require('dotenv').config();
 const express = require('express');
-const crypto = require('crypto');
-const fs = require('fs');
 const path = require('path');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
+const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'QuangHoang_Admin_2026';
-const TOKEN_SECRET = process.env.SESSION_SECRET || `spf_secret_${ADMIN_PASSWORD}_2026`;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'quanghoang123';
+const DATA_FILE = path.join(__dirname, 'keys-data.json');
 
-// Bắt buộc trên Render để nhận diện đúng IP từng điện thoại, không chặn nhầm
-app.set('trust proxy', 1);
+app.use(express.json({ limit: '2mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(cors());
-app.use(express.json());
+// Lưu trữ trong RAM + File
+let keysStore = {};
+const clientSessions = new Map();
+const adminTokens = new Set();
 
-// Tự động chuyển hướng trang chủ về /app
-app.get('/', (req, res) => {
-  res.redirect('/app');
-});
-
-app.use('/app', express.static(path.join(__dirname, 'public/client')));
-app.use('/admin', express.static(path.join(__dirname, 'public/admin')));
-
-const dataDir = path.join(__dirname, 'data');
-const dbPath = path.join(dataDir, 'db.json');
-const hexRefPath = path.join(dataDir, 'hex_reference.txt');
-
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify({ keys: [], configs: {}, logs: [] }, null, 2));
-}
-if (!fs.existsSync(hexRefPath)) {
-  fs.writeFileSync(
-    hexRefPath,
-    '4845585F5245464552454E43455F5350465F484F414E475F53494D554C4154494F4E5F4F4E4C59'
-  );
-}
-
-function readDB() {
+function loadKeysFromDisk() {
   try {
-    return JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
-  } catch {
-    return { keys: [], configs: {}, logs: [] };
+    if (fs.existsSync(DATA_FILE)) {
+      const raw = fs.readFileSync(DATA_FILE, 'utf8');
+      keysStore = JSON.parse(raw) || {};
+    }
+  } catch (err) {
+    keysStore = {};
   }
 }
 
-function writeDB(data) {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-}
-
-function addAuditLog(action, detail) {
-  const db = readDB();
-  if (!Array.isArray(db.logs)) db.logs = [];
-  db.logs.unshift({
-    id: crypto.randomUUID(),
-    timestamp: new Date().toISOString(),
-    action,
-    detail
-  });
-  db.logs = db.logs.slice(0, 100);
-  writeDB(db);
-}
-
-// Cơ chế Token chữ ký số (Không bị mất phiên khi dùng trên điện thoại hoặc khi server khởi động lại)
-function signToken(payloadObj) {
-  const data = Buffer.from(JSON.stringify(payloadObj)).toString('base64url');
-  const sig = crypto.createHmac('sha256', TOKEN_SECRET).update(data).digest('base64url');
-  return `${data}.${sig}`;
-}
-
-function verifyToken(token) {
-  if (!token || typeof token !== 'string' || !token.includes('.')) return null;
-  const [data, sig] = token.split('.');
-  const expectedSig = crypto.createHmac('sha256', TOKEN_SECRET).update(data).digest('base64url');
-  if (sig !== expectedSig) return null;
+function saveKeysToDisk() {
   try {
-    return JSON.parse(Buffer.from(data, 'base64url').toString('utf-8'));
-  } catch {
-    return null;
-  }
+    fs.writeFileSync(DATA_FILE, JSON.stringify(keysStore, null, 2), 'utf8');
+  } catch (err) {}
 }
+
+loadKeysFromDisk();
 
 const DURATION_MAP = {
-  '1h': { label: '1 giờ', ms: 60 * 60 * 1000 },
-  '1d': { label: '1 ngày', ms: 24 * 60 * 60 * 1000 },
-  '7d': { label: '7 ngày', ms: 7 * 24 * 60 * 60 * 1000 },
-  '1m': { label: '1 tháng', ms: 30 * 24 * 60 * 60 * 1000 },
-  '1y': { label: '1 năm', ms: 365 * 24 * 60 * 60 * 1000 },
+  '1h': { label: '1 Giờ', ms: 1 * 60 * 60 * 1000 },
+  '2h': { label: '2 Giờ', ms: 2 * 60 * 60 * 1000 },
+  '5h': { label: '5 Giờ', ms: 5 * 60 * 60 * 1000 },
+  '1d': { label: '1 Ngày', ms: 24 * 60 * 60 * 1000 },
+  '1w': { label: '1 Tuần', ms: 7 * 24 * 60 * 60 * 1000 },
+  '2w': { label: '2 Tuần', ms: 14 * 24 * 60 * 60 * 1000 },
+  '1m': { label: '1 Tháng', ms: 30 * 24 * 60 * 60 * 1000 },
+  '2m': { label: '2 Tháng', ms: 60 * 24 * 60 * 60 * 1000 },
+  '1y': { label: '1 Năm', ms: 365 * 24 * 60 * 60 * 1000 },
   'forever': { label: 'Vĩnh viễn', ms: null }
 };
 
-function evaluateKeyStatus(keyRecord) {
-  if (keyRecord.revoked) return 'revoked';
-  if (keyRecord.expiresAt !== null && Date.now() > keyRecord.expiresAt) {
-    return 'expired';
-  }
-  return 'active';
+function generateFormattedKey() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const seg = () => Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return `SPF-${seg()}-${seg()}-${seg()}`;
 }
-
-// Giới hạn chống dò mật khẩu nhưng thoải mái cho người dùng thật
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { success: false, message: 'Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.' }
-});
 
 function requireAdmin(req, res, next) {
-  const authHeader = req.headers.authorization || '';
-  const token = authHeader.replace('Bearer ', '').trim();
-  const payload = verifyToken(token);
-
-  if (!payload || payload.role !== 'admin') {
-    return res.status(401).json({ success: false, message: 'Phiên đăng nhập Admin đã hết hạn. Vui lòng đăng nhập lại.' });
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '').trim();
+  if (!adminTokens.has(token)) {
+    return res.status(401).json({ success: false, message: 'Phiên Admin hết hạn. Vui lòng đăng nhập lại.' });
   }
   next();
 }
 
-function requireUserSession(req, res, next) {
-  const authHeader = req.headers.authorization || '';
-  const token = authHeader.replace('Bearer ', '').trim();
-  const payload = verifyToken(token);
+// Ping giữ server Render không bị ngủ
+app.get('/api/ping', (req, res) => {
+  res.json({ ok: true, time: Date.now() });
+});
 
-  if (!payload || payload.role !== 'user' || !payload.key) {
-    return res.status(401).json({ success: false, message: 'Phiên đăng nhập không hợp lệ.' });
+// ================= API ADMIN =================
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body || {};
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ success: false, message: 'Mật khẩu Admin không đúng!' });
   }
-
-  const db = readDB();
-  const keyRecord = (db.keys || []).find(k => k.key === payload.key);
-  if (!keyRecord) {
-    return res.status(401).json({ success: false, message: 'Key không tồn tại.' });
-  }
-
-  const currentStatus = evaluateKeyStatus(keyRecord);
-  if (currentStatus !== 'active') {
-    return res.status(403).json({
-      success: false,
-      status: currentStatus,
-      message: currentStatus === 'revoked' ? 'Key đã bị thu hồi.' : 'Key đã hết hạn sử dụng.'
-    });
-  }
-
-  // Kiểm tra đúng thiết bị đã gắn với Key
-  if (keyRecord.deviceId && keyRecord.deviceId !== payload.deviceId) {
-    return res.status(403).json({
-      success: false,
-      status: 'device_mismatch',
-      message: 'Key này đang được sử dụng trên một thiết bị khác!'
-    });
-  }
-
-  req.userKey = keyRecord.key;
-  next();
-}
-
-/* ================= API QUẢN TRỊ VIÊN ================= */
-
-app.post('/api/admin/login', loginLimiter, (req, res) => {
-  const { password } = req.body;
-  if (!password || password !== ADMIN_PASSWORD) {
-    addAuditLog('ADMIN_LOGIN_FAILED', 'Nhập sai mật khẩu quản trị');
-    return res.status(401).json({ success: false, message: 'Mật khẩu quản trị không chính xác.' });
-  }
-  const token = signToken({ role: 'admin', iat: Date.now() });
-  addAuditLog('ADMIN_LOGIN_SUCCESS', 'Quản trị viên đăng nhập thành công');
+  const token = crypto.randomBytes(24).toString('hex');
+  adminTokens.add(token);
   res.json({ success: true, token });
 });
 
 app.get('/api/admin/keys', requireAdmin, (req, res) => {
-  const db = readDB();
-  const enrichedKeys = (db.keys || []).map(k => ({
-    ...k,
-    status: evaluateKeyStatus(k)
-  }));
-  res.json({ success: true, keys: enrichedKeys, logs: (db.logs || []).slice(0, 30) });
+  const now = Date.now();
+  const list = Object.values(keysStore)
+    .map(k => ({
+      ...k,
+      isExpired: k.expiresAt ? now > k.expiresAt : false
+    }))
+    .sort((a, b) => b.createdAt - a.createdAt);
+  res.json({ success: true, keys: list });
 });
 
-// Không gắn rate-limit ở nút tạo key để Admin tạo liên tục trên điện thoại không bị lỗi
-app.post('/api/admin/keys/create', requireAdmin, (req, res) => {
-  const { durationCode } = req.body;
-  const durationInfo = DURATION_MAP[durationCode];
-
-  if (!durationInfo) {
-    return res.status(400).json({ success: false, message: 'Thời hạn key không hợp lệ.' });
+// Tự động khôi phục Key từ bản sao lưu của trình duyệt Admin nếu Render vừa khởi động lại
+app.post('/api/admin/sync-restore', requireAdmin, (req, res) => {
+  const { backupKeys } = req.body || {};
+  let restoredCount = 0;
+  if (Array.isArray(backupKeys)) {
+    backupKeys.forEach(item => {
+      if (item && item.key && !keysStore[item.key]) {
+        keysStore[item.key] = item;
+        restoredCount++;
+      }
+    });
+    if (restoredCount > 0) saveKeysToDisk();
   }
+  res.json({ success: true, restoredCount, total: Object.keys(keysStore).length });
+});
 
-  const db = readDB();
-  if (!Array.isArray(db.keys)) db.keys = [];
-
-  let newKey = '';
-  do {
-    const p1 = crypto.randomBytes(3).toString('hex').toUpperCase();
-    const p2 = crypto.randomBytes(3).toString('hex').toUpperCase();
-    const p3 = crypto.randomBytes(3).toString('hex').toUpperCase();
-    newKey = `SPF-${p1}-${p2}-${p3}`;
-  } while (db.keys.some(k => k.key === newKey));
-
+app.post('/api/admin/generate-key', requireAdmin, (req, res) => {
+  const { durationCode, note } = req.body || {};
+  const d = DURATION_MAP[durationCode] || DURATION_MAP['1d'];
+  const newKey = generateFormattedKey();
   const now = Date.now();
-  const expiresAt = durationInfo.ms ? now + durationInfo.ms : null;
 
-  const keyRecord = {
-    id: crypto.randomUUID(),
+  const record = {
     key: newKey,
-    durationCode,
-    durationLabel: durationInfo.label,
+    durationCode: durationCode || '1d',
+    durationLabel: d.label,
     createdAt: now,
-    expiresAt,
-    revoked: false,
-    deviceId: null,
-    deviceName: null,
-    boundAt: null
+    expiresAt: d.ms ? now + d.ms : null,
+    note: (note || '').trim(),
+    boundDeviceId: null,
+    boundDeviceName: null,
+    boundAt: null,
+    savedConfig: null
   };
 
-  db.keys.unshift(keyRecord);
-  writeDB(db);
-  addAuditLog('KEY_CREATED', `Tạo key ${newKey} (${durationInfo.label})`);
+  keysStore[newKey] = record;
+  saveKeysToDisk();
+  res.json({ success: true, keyData: record });
+});
+
+// XOÁ 1 KEY BẤT KỲ
+app.delete('/api/admin/keys/:key', requireAdmin, (req, res) => {
+  const targetKey = (req.params.key || '').trim().toUpperCase();
+  if (!keysStore[targetKey]) {
+    return res.status(404).json({ success: false, message: 'Không tìm thấy Key này.' });
+  }
+  delete keysStore[targetKey];
+  saveKeysToDisk();
+  res.json({ success: true, message: `Đã xoá Key ${targetKey} khỏi hệ thống.` });
+});
+
+// XOÁ TẤT CẢ KEY ĐÃ HẾT HẠN CHO NHẸ SERVER
+app.post('/api/admin/cleanup-expired', requireAdmin, (req, res) => {
+  const now = Date.now();
+  let deletedCount = 0;
+  Object.keys(keysStore).forEach(k => {
+    const item = keysStore[k];
+    if (item.expiresAt && now > item.expiresAt) {
+      delete keysStore[k];
+      deletedCount++;
+    }
+  });
+  saveKeysToDisk();
+  res.json({ success: true, deletedCount, message: `Đã dọn dẹp ${deletedCount} Key hết hạn!` });
+});
+
+// ================= API CLIENT =================
+app.post('/api/client/verify-key', (req, res) => {
+  const { key, deviceId, deviceName } = req.body || {};
+  const cleanKey = (key || '').trim().toUpperCase();
+
+  if (!cleanKey || !keysStore[cleanKey]) {
+    return res.status(404).json({ success: false, message: 'Mã Key không tồn tại hoặc đã bị Admin xoá!' });
+  }
+
+  const record = keysStore[cleanKey];
+  const now = Date.now();
+
+  if (record.expiresAt && now > record.expiresAt) {
+    return res.status(403).json({ success: false, message: 'Mã Key này đã hết hạn sử dụng!' });
+  }
+
+  if (record.boundDeviceId && record.boundDeviceId !== deviceId) {
+    return res.status(403).json({
+      success: false,
+      message: `Key này đã bị khóa trên thiết bị khác (${record.boundDeviceName || 'Thiết bị đầu tiên'})! Mỗi Key chỉ dùng cho 1 máy.`
+    });
+  }
+
+  if (!record.boundDeviceId) {
+    record.boundDeviceId = deviceId;
+    record.boundDeviceName = deviceName || 'Thiết bị di động';
+    record.boundAt = now;
+    saveKeysToDisk();
+  }
+
+  const sessionToken = crypto.randomBytes(20).toString('hex');
+  clientSessions.set(sessionToken, cleanKey);
 
   res.json({
     success: true,
-    message: 'Tạo key mới thành công.',
-    keyData: { ...keyRecord, status: 'active' }
-  });
-});
-
-app.post('/api/admin/keys/revoke', requireAdmin, (req, res) => {
-  const { id } = req.body;
-  const db = readDB();
-  const target = (db.keys || []).find(k => k.id === id);
-
-  if (!target) {
-    return res.status(404).json({ success: false, message: 'Không tìm thấy key.' });
-  }
-
-  target.revoked = true;
-  writeDB(db);
-  addAuditLog('KEY_REVOKED', `Thu hồi key ${target.key}`);
-
-  res.json({ success: true, message: `Đã thu hồi key ${target.key}.` });
-});
-
-// Cho phép Admin mở khóa thiết bị (Reset thiết bị) nếu muốn đổi máy cho người dùng
-app.post('/api/admin/keys/reset-device', requireAdmin, (req, res) => {
-  const { id } = req.body;
-  const db = readDB();
-  const target = (db.keys || []).find(k => k.id === id);
-
-  if (!target) {
-    return res.status(404).json({ success: false, message: 'Không tìm thấy key.' });
-  }
-
-  target.deviceId = null;
-  target.deviceName = null;
-  target.boundAt = null;
-  writeDB(db);
-  addAuditLog('KEY_DEVICE_RESET', `Reset thiết bị cho key ${target.key}`);
-
-  res.json({ success: true, message: `Đã mở khóa thiết bị cho key ${target.key}.` });
-});
-
-/* ================= API NGƯỜI DÙNG (1 KEY = 1 THIẾT BỊ) ================= */
-
-app.post('/api/client/verify-key', loginLimiter, (req, res) => {
-  const { key, deviceId, deviceName } = req.body;
-  if (!key || typeof key !== 'string') {
-    return res.status(400).json({ success: false, status: 'invalid', message: 'Vui lòng nhập mã key.' });
-  }
-  if (!deviceId || typeof deviceId !== 'string') {
-    return res.status(400).json({ success: false, status: 'invalid', message: 'Không nhận diện được mã thiết bị.' });
-  }
-
-  const normalizedKey = key.trim().toUpperCase();
-  const db = readDB();
-  const keyRecord = (db.keys || []).find(k => k.key === normalizedKey);
-
-  if (!keyRecord) {
-    return res.status(404).json({
-      success: false,
-      status: 'invalid',
-      message: 'Key không hợp lệ hoặc không tồn tại trên hệ thống.'
-    });
-  }
-
-  const status = evaluateKeyStatus(keyRecord);
-  if (status === 'revoked') {
-    return res.status(403).json({
-      success: false,
-      status: 'revoked',
-      message: 'Key này đã bị quản trị viên thu hồi.'
-    });
-  }
-  if (status === 'expired') {
-    return res.status(403).json({
-      success: false,
-      status: 'expired',
-      message: 'Key đã hết hạn sử dụng. Vui lòng liên hệ Admin hoặc vào Box Zalo.'
-    });
-  }
-
-  // KIỂM TRA KHÓA 1 THIẾT BỊ DUY NHẤT
-  if (!keyRecord.deviceId) {
-    // Lần đầu tiên đăng nhập: Gắn chặt Key với Thiết bị này
-    keyRecord.deviceId = deviceId;
-    keyRecord.deviceName = deviceName || 'Thiết bị đã xác thực';
-    keyRecord.boundAt = Date.now();
-    writeDB(db);
-    addAuditLog('KEY_DEVICE_BOUND', `Key ${keyRecord.key} đã khóa vào thiết bị: ${keyRecord.deviceName}`);
-  } else if (keyRecord.deviceId !== deviceId) {
-    // Nếu mang Key sang máy thứ 2: Từ chối ngay lập tức
-    return res.status(403).json({
-      success: false,
-      status: 'device_locked',
-      message: `Key này đã được kích hoạt trên thiết bị khác (${keyRecord.deviceName || 'Máy khác'}). Mỗi Key chỉ được sử dụng trên 1 thiết bị duy nhất!`
-    });
-  }
-
-  const sessionToken = signToken({
-    role: 'user',
-    key: keyRecord.key,
-    deviceId: keyRecord.deviceId,
-    iat: Date.now()
-  });
-
-  const savedConfig = (db.configs && db.configs[keyRecord.key]) || null;
-
-  res.json({
-    success: true,
-    status: 'active',
-    message: 'Xác thực key & thiết bị hợp lệ!',
+    message: 'Xác thực Key thành công!',
     sessionToken,
     keyInfo: {
-      key: keyRecord.key,
-      durationLabel: keyRecord.durationLabel,
-      createdAt: keyRecord.createdAt,
-      expiresAt: keyRecord.expiresAt,
-      deviceName: keyRecord.deviceName
+      key: record.key,
+      durationLabel: record.durationLabel,
+      expiresAt: record.expiresAt
     },
-    savedConfig
+    savedConfig: record.savedConfig
   });
 });
 
-app.post('/api/client/config', requireUserSession, (req, res) => {
-  const { features, optimizer } = req.body;
-  const db = readDB();
-  if (!db.configs) db.configs = {};
+app.post('/api/client/config', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '').trim();
+  const key = clientSessions.get(token);
 
-  db.configs[req.userKey] = {
-    updatedAt: Date.now(),
-    features: features || {},
-    optimizer: typeof optimizer === 'number' ? Math.min(100, Math.max(0, optimizer)) : 50
-  };
-  writeDB(db);
-  res.json({ success: true, message: 'Đã lưu cấu hình.' });
-});
-
-app.get('/api/client/hex-reference', requireUserSession, (req, res) => {
-  const rawHex = fs.readFileSync(hexRefPath, 'utf-8').trim();
-  const isValidHex = /^[0-9A-Fa-f\s]+$/.test(rawHex);
-  const sha256 = crypto.createHash('sha256').update(rawHex).digest('hex');
-
-  let decodedPreview = '';
-  if (isValidHex) {
-    try {
-      const cleanHex = rawHex.replace(/\s+/g, '');
-      decodedPreview = Buffer.from(cleanHex.slice(0, 200), 'hex').toString('utf-8');
-    } catch {
-      decodedPreview = 'Không thể giải mã UTF-8';
-    }
+  if (!key || !keysStore[key]) {
+    return res.status(401).json({ success: false });
   }
 
-  res.json({
-    success: true,
-    integrity: {
-      isValidHex,
-      byteLength: Math.floor(rawHex.replace(/\s+/g, '').length / 2),
-      sha256
-    },
-    rawHexPreview: rawHex.slice(0, 512),
-    decodedPreview
-  });
+  keysStore[key].savedConfig = {
+    features: req.body.features || {},
+    optimizer: req.body.optimizer ?? 90,
+    updatedAt: Date.now()
+  };
+  saveKeysToDisk();
+  res.json({ success: true });
+});
+
+// Điều hướng trang
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html'));
+});
+
+app.get(['/', '/app'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'client', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`========================================`);
-  console.log(`Hệ thống đã khởi chạy thành công:`);
-  console.log(`- Webapp Spf_Hoang:  http://localhost:${PORT}/app`);
-  console.log(`- Webapp Quản trị:   http://localhost:${PORT}/admin`);
-  console.log(`========================================`);
+  console.log(`Spf_Hoang Server running on port ${PORT}`);
 });
