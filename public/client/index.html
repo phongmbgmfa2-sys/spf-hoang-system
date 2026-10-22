@@ -65,7 +65,7 @@
   <div class="app-container">
     <header class="brand-header">
       <h1 class="brand-title">Spf_Hoang</h1>
-      <span class="sim-badge">Hệ thống Điều khiển VIP • Khóa 1 Thiết bị • Tối Ưu Ngầm Tự Động</span>
+      <span class="sim-badge">Hệ thống Điều khiển VIP • Khóa 1 Thiết bị • Tự Động Lưu Phiên Key</span>
     </header>
 
     <!-- TRANG 1: NHẬP KEY -->
@@ -75,9 +75,9 @@
           <span>BOX ZALO</span>
           <span class="btn-subtext">Tham gia cộng đồng nhận hỗ trợ</span>
         </a>
-        <a href="tel:0788686079" class="btn-action">
+        <a href="https://zalo.me/84788686079" target="_blank" rel="noopener noreferrer" class="btn-action">
           <span>📞LIÊN HỆ ADMIN QUANG HOANG</span>
-          <span class="btn-subtext">SĐT: 0788686079</span>
+          <span class="btn-subtext">Zalo: 0788686079</span>
         </a>
       </div>
 
@@ -97,7 +97,7 @@
           <strong>Key:</strong> <span id="sessionKeyText" style="color: var(--aqua-primary);"></span>
           <span id="sessionExpiryText" style="color: var(--text-muted); margin-left: 6px;"></span>
         </div>
-        <button type="button" id="btnLogout" class="btn-outline">Đăng xuất</button>
+        <button type="button" id="btnLogout" class="btn-outline">Đổi Key / Đăng xuất</button>
       </div>
 
       <div class="preset-bar">
@@ -169,6 +169,8 @@
   </div>
 
   <script>
+    const CLIENT_SESSION_STORAGE_KEY = 'spf_saved_client_session_v2';
+
     const FEATURE_DEFINITIONS = [
       { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯', sub: 'NHE_TAM_VIP + V2/V3' },
       { id: 'tang_nhay', name: 'Tăng Nhạy (x18)', icon: '⚡', sub: 'Sensi 1/2 + Nhạy x18' },
@@ -227,6 +229,45 @@
       el.className = `status-box status-${type}`;
       el.style.display = 'block';
       el.textContent = text;
+    }
+
+    // Lưu phiên Key và cấu hình vào thiết bị để thoát web vào lại không cần nhập lại Key
+    function saveClientSessionToStorage() {
+      if (!appState.sessionToken || !appState.keyInfo) return;
+      try {
+        localStorage.setItem(
+          CLIENT_SESSION_STORAGE_KEY,
+          JSON.stringify({
+            sessionToken: appState.sessionToken,
+            keyInfo: appState.keyInfo,
+            optimizer: appState.optimizer,
+            headshotPower: appState.headshotPower,
+            dpi: appState.dpi,
+            features: appState.features
+          })
+        );
+      } catch (e) {}
+    }
+
+    function clearClientSessionFromStorage() {
+      try {
+        localStorage.removeItem(CLIENT_SESSION_STORAGE_KEY);
+      } catch (e) {}
+    }
+
+    function forceLogoutToKeyScreen(reasonMessage) {
+      appState.sessionToken = null;
+      appState.keyInfo = null;
+      clearClientSessionFromStorage();
+
+      pageDashboard.classList.add('hidden');
+      pageDashboard.style.display = 'none';
+      pageKeyAuth.classList.remove('hidden');
+      pageKeyAuth.style.display = 'block';
+
+      if (reasonMessage) {
+        showStatus(authStatusBox, 'error', reasonMessage);
+      }
     }
 
     function renderFeatureCards() {
@@ -328,6 +369,7 @@
     optimizerSlider.addEventListener('change', () => persistConfiguration());
 
     async function persistConfiguration() {
+      saveClientSessionToStorage();
       if (!appState.sessionToken) return;
       try {
         await fetch('/api/client/config', {
@@ -360,7 +402,6 @@
     });
 
     function openDashboardView() {
-      // Ép ẩn trang nhập Key và hiện trang điều khiển trực tiếp
       pageKeyAuth.classList.add('hidden');
       pageKeyAuth.style.display = 'none';
 
@@ -376,8 +417,85 @@
       optimizerSlider.value = appState.optimizer;
       optimizerValueDisplay.textContent = appState.optimizer + '%';
       optSubVal.textContent = appState.optimizer + '%';
+      document.getElementById('hsPowerSlider').value = appState.headshotPower;
+      document.getElementById('hsPowerVal').textContent = appState.headshotPower + '%';
+      document.getElementById('dpiSlider').value = appState.dpi;
+      document.getElementById('dpiVal').textContent = appState.dpi + ' DPI';
       renderFeatureCards();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function applyServerDataToState(rawKey, data) {
+      appState.sessionToken = data.sessionToken || rawKey;
+      appState.keyInfo = data.keyInfo || { key: rawKey, durationLabel: 'VIP' };
+
+      if (data.savedConfig && data.savedConfig.features) {
+        const { _bgSettings, ...rest } = data.savedConfig.features;
+        FEATURE_DEFINITIONS.forEach(d => {
+          if (rest[d.id] && typeof rest[d.id] === 'object') {
+            appState.features[d.id] = {
+              enabled: Boolean(rest[d.id].enabled),
+              value: Number(rest[d.id].value ?? 90)
+            };
+          }
+        });
+        if (_bgSettings) {
+          appState.headshotPower = Number(_bgSettings.power ?? 95);
+          appState.dpi = Number(_bgSettings.dpi ?? 960);
+        }
+        if (typeof data.savedConfig.optimizer === 'number') {
+          appState.optimizer = data.savedConfig.optimizer;
+        }
+      }
+      saveClientSessionToStorage();
+    }
+
+    // Tự động kiểm tra và vào thẳng bảng điều khiển khi mở lại web nếu Key còn hạn
+    async function restoreSavedSessionOnLoad() {
+      try {
+        const raw = localStorage.getItem(CLIENT_SESSION_STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (!saved || !saved.keyInfo || !saved.keyInfo.key) return;
+
+        // Kiểm tra hạn sử dụng ngay trên máy
+        if (saved.keyInfo.expiresAt && Date.now() > saved.keyInfo.expiresAt) {
+          forceLogoutToKeyScreen('Mã Key của bạn đã hết thời gian sử dụng. Vui lòng nhập Key mới!');
+          return;
+        }
+
+        // Khôi phục trạng thái và mở ngay bảng điều khiển không cần chờ
+        appState.sessionToken = saved.sessionToken || saved.keyInfo.key;
+        appState.keyInfo = saved.keyInfo;
+        if (typeof saved.optimizer === 'number') appState.optimizer = saved.optimizer;
+        if (typeof saved.headshotPower === 'number') appState.headshotPower = saved.headshotPower;
+        if (typeof saved.dpi === 'number') appState.dpi = saved.dpi;
+        if (saved.features) Object.assign(appState.features, saved.features);
+
+        openDashboardView();
+
+        // Kiểm tra ngầm với Server xem Key có bị Admin xoá hay hết hạn không
+        const { deviceId, deviceName } = getDeviceIdentity();
+        const res = await fetch('/api/client/verify-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: saved.keyInfo.key, deviceId, deviceName })
+        });
+        const data = await res.json();
+
+        if (res.status === 403 || (data && data.success === false)) {
+          forceLogoutToKeyScreen(data.message || 'Key đã hết hạn hoặc bị huỷ.');
+          return;
+        }
+
+        if (res.ok && data.success) {
+          // Giữ nguyên thời hạn gốc nếu lịch sử máy chủ vừa khởi động lại
+          if (saved.keyInfo.expiresAt && data.keyInfo) {
+            data.keyInfo.expiresAt = Math.min(saved.keyInfo.expiresAt, data.keyInfo.expiresAt || saved.keyInfo.expiresAt);
+          }
+          applyServerDataToState(saved.keyInfo.key, data);
+          openDashboardView();
+        }
+      } catch (e) {}
     }
 
     document.getElementById('keyForm').addEventListener('submit', async e => {
@@ -404,41 +522,17 @@
           return;
         }
 
-        appState.sessionToken = data.sessionToken || rawKey;
-        appState.keyInfo = data.keyInfo || { key: rawKey, durationLabel: 'VIP' };
-
-        if (data.savedConfig && data.savedConfig.features) {
-          const { _bgSettings, ...rest } = data.savedConfig.features;
-          FEATURE_DEFINITIONS.forEach(d => {
-            if (rest[d.id] && typeof rest[d.id] === 'object') {
-              appState.features[d.id] = {
-                enabled: Boolean(rest[d.id].enabled),
-                value: Number(rest[d.id].value ?? 90)
-              };
-            }
-          });
-          if (_bgSettings) {
-            appState.headshotPower = Number(_bgSettings.power ?? 95);
-            appState.dpi = Number(_bgSettings.dpi ?? 960);
-          }
-          if (typeof data.savedConfig.optimizer === 'number') {
-            appState.optimizer = data.savedConfig.optimizer;
-          }
-        }
-
+        applyServerDataToState(rawKey, data);
         showStatus(authStatusBox, 'success', '✔ Xác thực thành công! Đang vào trang...');
         openDashboardView();
       } catch (err) {
-        showStatus(authStatusBox, 'error', 'Lỗi kết nối máy chủ. Hãy tải lại trang (F5) và thử lại!');
+        showStatus(authStatusBox, 'error', 'Lỗi kết nối máy chủ. Hãy tải lại trang và thử lại!');
       }
     });
 
     document.getElementById('btnLogout').addEventListener('click', () => {
-      appState.sessionToken = null;
-      pageDashboard.classList.add('hidden');
-      pageDashboard.style.display = 'none';
-      pageKeyAuth.classList.remove('hidden');
-      pageKeyAuth.style.display = 'block';
+      forceLogoutToKeyScreen('');
+      authStatusBox.style.display = 'none';
     });
 
     function handleGameSelection(gameType) {
@@ -481,6 +575,16 @@
 
     document.getElementById('btnLaunchFFNormal').addEventListener('click', () => handleGameSelection('normal'));
     document.getElementById('btnLaunchFFMax').addEventListener('click', () => handleGameSelection('max'));
+
+    // Tự động kiểm tra hết hạn mỗi 10 giây khi đang mở bảng điều khiển
+    setInterval(() => {
+      if (appState.keyInfo && appState.keyInfo.expiresAt && Date.now() > appState.keyInfo.expiresAt) {
+        forceLogoutToKeyScreen('Mã Key của bạn vừa hết thời gian sử dụng!');
+      }
+    }, 10000);
+
+    // Khởi chạy tự động đăng nhập khi vừa mở web
+    restoreSavedSessionOnLoad();
     setInterval(() => fetch('/api/ping').catch(() => {}), 300000);
   </script>
 </body>
