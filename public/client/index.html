@@ -85,13 +85,13 @@
 
       <form id="keyForm">
         <input type="text" id="keyInput" class="input-cyber" placeholder="Nhập mã Key của bạn (VD: SPF-XXXXXX-XXXXXX-XXXXXX)" autocomplete="off" required />
-        <button type="submit" class="btn-action" style="width: 100%;">XÁC NHẬN &amp; TRUY CẬP</button>
+        <button type="submit" id="btnSubmitKey" class="btn-action" style="width: 100%;">XÁC NHẬN &amp; TRUY CẬP</button>
       </form>
       <div id="authStatusBox" class="status-box"></div>
     </section>
 
-    <!-- TRANG 2: BẢNG ĐIỀU KHIỂN CHÍNH (ẨN TOÀN BỘ MÃ CODE/HEX, CHỈ CHỈNH & ÁP DỤNG) -->
-    <section id="pageDashboard" class="hidden">
+    <!-- TRANG 2: BẢNG ĐIỀU KHIỂN CHÍNH -->
+    <section id="pageDashboard" class="hidden" style="display: none;">
       <div class="session-bar">
         <div>
           <strong>Key:</strong> <span id="sessionKeyText" style="color: var(--aqua-primary);"></span>
@@ -106,10 +106,8 @@
         <button type="button" class="btn-outline" onclick="applyQuickPreset('reset')">🔄 Mặc định</button>
       </div>
 
-      <!-- 8 Ô chức năng -->
       <div id="featuresContainer" class="features-grid" style="margin-bottom: 16px;"></div>
 
-      <!-- Thanh trượt Optimizer (Đã gộp ngầm toàn bộ 28 file text/hex/cpp vào đây) -->
       <div class="glass-panel">
         <div class="section-title">
           <span>🚀 Optimizer (All-In-One Pack) &amp; Độ Nhạy</span>
@@ -146,7 +144,6 @@
         <div id="applyStatusBox" class="status-box"></div>
       </div>
 
-      <!-- Mở thẳng vào Game -->
       <div class="glass-panel">
         <div class="section-title"><span>🎮 Vào Thẳng Game</span></div>
         <div class="game-grid">
@@ -172,52 +169,6 @@
   </div>
 
   <script>
-    // KHO TÍCH HỢP NGẦM TOÀN BỘ FILE TEXT/CPP/HEX VÀO OPTIMIZER (ẨN HOÀN TOÀN TRÊN GIAO DIỆN)
-    const OPTIMIZER_SILENT_PACK = Object.freeze({
-      engineVersion: 'SPF_OPTIMIZER_ALL_IN_ONE_V12',
-      highPerformanceCore: 'Hiệu Năng Cao Ss2 2.hex',
-      pack1_vipTextCpp: [
-        'm.txt',
-        'c# vip limitted.txt',
-        't game.txt',
-        'BAM DAU VIP.txt',
-        'khoa u mu t(1).txt',
-        'Data Xoa Rung Ta m.txt',
-        'Vipp(1).cpp',
-        'HeadLock.cpp',
-        'u Cha t V5.txt',
-        'U BA U.txt',
-        'c# aimlock + nhe m + ba u 80%-1.txt',
-        'M TA M + RECOILL.txt',
-        't game ff.txt',
-        'c# aimlock + nhe m + ba u 80%.txt',
-        'Code Ba m Ta m.txt'
-      ],
-      pack2_8FileHex: [
-        'config_toi_uu_ffth___ffmax.hex.txt',
-        'toi_uu_hieu_nang_adr_thap.hex.txt',
-        'Aimlock_code.hex.txt',
-        'Nha y 2.txt',
-        'NHE_TAM_VIP.hex.txt',
-        'Nhe Vip_1.txt',
-        'nhe_tam_cuc_manh_v3.hex.txt',
-        'Sensi1_1.txt',
-        'Nhe m 2.txt',
-        'Nhe_Tam_V2_1.hex.txt',
-        'Aimlock___ghim_tam__1_.hex.txt',
-        'Giam_lag__1_.hex.txt',
-        'Sensi2_1.txt',
-        'nhe m.txt'
-      ],
-      activeFlags: {
-        ffth_ffmax_opt: true,
-        low_end_adr_ios_boost: true,
-        anti_lag_frame_ pacing: true,
-        recoil_stabilizer_80: true,
-        sensi_v1_v2_v3_vip: true
-      }
-    });
-
     const FEATURE_DEFINITIONS = [
       { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯', sub: 'NHE_TAM_VIP + V2/V3' },
       { id: 'tang_nhay', name: 'Tăng Nhạy (x18)', icon: '⚡', sub: 'Sensi 1/2 + Nhạy x18' },
@@ -243,13 +194,18 @@
     });
 
     function getDeviceIdentity() {
-      let savedId = localStorage.getItem('spf_unique_device_id');
-      if (!savedId) {
-        const raw = [navigator.platform, screen.width + 'x' + screen.height, Date.now()].join('|');
-        let hash = 0;
-        for (let i = 0; i < raw.length; i++) hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0;
-        savedId = 'DEV-' + Math.abs(hash).toString(16).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-        localStorage.setItem('spf_unique_device_id', savedId);
+      let savedId = '';
+      try {
+        savedId = localStorage.getItem('spf_unique_device_id') || '';
+        if (!savedId) {
+          const raw = [navigator.platform, screen.width + 'x' + screen.height, Date.now()].join('|');
+          let hash = 0;
+          for (let i = 0; i < raw.length; i++) hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0;
+          savedId = 'DEV-' + Math.abs(hash).toString(16).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+          localStorage.setItem('spf_unique_device_id', savedId);
+        }
+      } catch (e) {
+        savedId = 'DEV-MOBILE-DEFAULT';
       }
       const ua = navigator.userAgent || '';
       let deviceName = 'Máy tính (PC)';
@@ -269,13 +225,14 @@
 
     function showStatus(el, type, text) {
       el.className = `status-box status-${type}`;
+      el.style.display = 'block';
       el.textContent = text;
     }
 
     function renderFeatureCards() {
       featuresContainer.innerHTML = '';
       FEATURE_DEFINITIONS.forEach(def => {
-        const cur = appState.features[def.id] || { enabled: false, value: 50 };
+        const cur = appState.features[def.id] || { enabled: true, value: 90 };
         const card = document.createElement('div');
         card.className = `feature-card ${cur.enabled ? 'active' : ''}`;
         card.id = `card_${def.id}`;
@@ -384,33 +341,34 @@
               ...appState.features,
               _bgSettings: {
                 power: appState.headshotPower,
-                dpi: appState.dpi,
-                optimizerPackCount:
-                  OPTIMIZER_SILENT_PACK.pack1_vipTextCpp.length +
-                  OPTIMIZER_SILENT_PACK.pack2_8FileHex.length,
-                optimizerModules: OPTIMIZER_SILENT_PACK.activeFlags
+                dpi: appState.dpi
               }
             },
             optimizer: appState.optimizer
           })
         });
-      } catch {}
+      } catch (e) {}
     }
 
     document.getElementById('btnApplyAll').addEventListener('click', async () => {
       const box = document.getElementById('applyStatusBox');
-      showStatus(box, 'loading', `Đang nạp ngầm gói Optimizer (${appState.optimizer}%) cùng toàn bộ cấu hình vào hệ thống...`);
+      showStatus(box, 'loading', `Đang nạp ngầm gói Optimizer (${appState.optimizer}%) cùng toàn bộ cấu hình...`);
       await persistConfiguration();
       setTimeout(() => {
         showStatus(box, 'success', '✔ Đã đồng bộ ngầm toàn bộ gói Optimizer & Độ nhạy! Hãy bấm chọn FreeFire bên dưới để vào thẳng game.');
-      }, 350);
+      }, 300);
     });
 
     function openDashboardView() {
+      // Ép ẩn trang nhập Key và hiện trang điều khiển trực tiếp
       pageKeyAuth.classList.add('hidden');
+      pageKeyAuth.style.display = 'none';
+
       pageDashboard.classList.remove('hidden');
+      pageDashboard.style.display = 'block';
+
       if (appState.keyInfo) {
-        document.getElementById('sessionKeyText').textContent = `${appState.keyInfo.key} (${appState.keyInfo.durationLabel})`;
+        document.getElementById('sessionKeyText').textContent = `${appState.keyInfo.key} (${appState.keyInfo.durationLabel || 'VIP'})`;
         document.getElementById('sessionExpiryText').textContent = appState.keyInfo.expiresAt
           ? `• Hết hạn: ${new Date(appState.keyInfo.expiresAt).toLocaleString('vi-VN')}`
           : '• Vĩnh viễn';
@@ -419,12 +377,17 @@
       optimizerValueDisplay.textContent = appState.optimizer + '%';
       optSubVal.textContent = appState.optimizer + '%';
       renderFeatureCards();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     document.getElementById('keyForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const rawKey = document.getElementById('keyInput').value.trim();
-      if (!rawKey) return;
+      const rawKey = document.getElementById('keyInput').value.trim().toUpperCase();
+      if (!rawKey) {
+        showStatus(authStatusBox, 'error', 'Vui lòng nhập mã Key!');
+        return;
+      }
+
       const { deviceId, deviceName } = getDeviceIdentity();
       showStatus(authStatusBox, 'loading', 'Đang kiểm tra Key...');
 
@@ -435,34 +398,47 @@
           body: JSON.stringify({ key: rawKey, deviceId, deviceName })
         });
         const data = await res.json();
+
         if (!res.ok || !data.success) {
-          showStatus(authStatusBox, 'error', data.message || 'Key không hợp lệ.');
+          showStatus(authStatusBox, 'error', data.message || 'Key không hợp lệ hoặc đã hết hạn.');
           return;
         }
-        appState.sessionToken = data.sessionToken;
-        appState.keyInfo = data.keyInfo;
+
+        appState.sessionToken = data.sessionToken || rawKey;
+        appState.keyInfo = data.keyInfo || { key: rawKey, durationLabel: 'VIP' };
+
         if (data.savedConfig && data.savedConfig.features) {
           const { _bgSettings, ...rest } = data.savedConfig.features;
-          Object.assign(appState.features, rest);
+          FEATURE_DEFINITIONS.forEach(d => {
+            if (rest[d.id] && typeof rest[d.id] === 'object') {
+              appState.features[d.id] = {
+                enabled: Boolean(rest[d.id].enabled),
+                value: Number(rest[d.id].value ?? 90)
+              };
+            }
+          });
           if (_bgSettings) {
-            appState.headshotPower = _bgSettings.power ?? 95;
-            appState.dpi = _bgSettings.dpi ?? 960;
+            appState.headshotPower = Number(_bgSettings.power ?? 95);
+            appState.dpi = Number(_bgSettings.dpi ?? 960);
           }
           if (typeof data.savedConfig.optimizer === 'number') {
             appState.optimizer = data.savedConfig.optimizer;
           }
         }
-        showStatus(authStatusBox, 'success', data.message);
-        setTimeout(() => openDashboardView(), 300);
-      } catch {
-        showStatus(authStatusBox, 'error', 'Không thể kết nối máy chủ.');
+
+        showStatus(authStatusBox, 'success', '✔ Xác thực thành công! Đang vào trang...');
+        openDashboardView();
+      } catch (err) {
+        showStatus(authStatusBox, 'error', 'Lỗi kết nối máy chủ. Hãy tải lại trang (F5) và thử lại!');
       }
     });
 
     document.getElementById('btnLogout').addEventListener('click', () => {
       appState.sessionToken = null;
       pageDashboard.classList.add('hidden');
+      pageDashboard.style.display = 'none';
       pageKeyAuth.classList.remove('hidden');
+      pageKeyAuth.style.display = 'block';
     });
 
     function handleGameSelection(gameType) {
