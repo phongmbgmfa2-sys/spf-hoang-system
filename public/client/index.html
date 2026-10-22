@@ -46,7 +46,7 @@
     .feature-title-wrap { display: flex; align-items: center; gap: 10px; }
     .feature-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(0, 242, 254, 0.14); border: 1px solid rgba(0, 242, 254, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
     .feature-name { font-weight: 700; font-size: 0.96rem; color: #fff; }
-    .feature-state-tag { font-size: 0.72rem; display: block; color: var(--text-muted); }
+    .feature-state-tag { font-size: 0.75rem; display: block; color: var(--text-muted); margin-top: 2px; }
     .switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider-toggle { position: absolute; cursor: pointer; inset: 0; background-color: #122a3a; border: 1px solid rgba(0, 242, 254, 0.35); transition: 0.25s; border-radius: 34px; }
@@ -110,13 +110,13 @@
 
       <div class="glass-panel">
         <div class="section-title">
-          <span>🚀 Optimizer (All-In-One Pack) &amp; Độ Nhạy</span>
+          <span>🚀 Optimizer &amp; Độ Nhạy</span>
           <span id="optimizerValueDisplay">95%</span>
         </div>
 
         <div style="margin-bottom: 14px;">
           <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
-            <span><strong>Optimizer Tổng Hợp (Hiệu Năng + Giảm Lag + Full Pack):</strong></span>
+            <span><strong>Optimizer (Hiệu Năng Cao):</strong></span>
             <span id="optSubVal" style="color:var(--aqua-primary); font-weight:800;">95%</span>
           </div>
           <input type="range" id="optimizerSlider" class="cyber-range" style="width:100%;" min="0" max="100" value="95" />
@@ -151,7 +151,7 @@
             <div class="game-icon">FF</div>
             <div>
               <div style="font-weight: 800;">FreeFire Thường</div>
-              <div style="font-size: 0.76rem; color: var(--text-muted);">Áp dụng ngầm &amp; Mở Game</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Áp dụng &amp; Mở Game</div>
             </div>
           </button>
 
@@ -159,7 +159,7 @@
             <div class="game-icon">MAX</div>
             <div>
               <div style="font-weight: 800;">FreeFireMax</div>
-              <div style="font-size: 0.76rem; color: var(--text-muted);">Áp dụng ngầm &amp; Mở Game</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Áp dụng &amp; Mở Game</div>
             </div>
           </button>
         </div>
@@ -172,14 +172,14 @@
     const CLIENT_SESSION_STORAGE_KEY = 'spf_saved_client_session_v2';
 
     const FEATURE_DEFINITIONS = [
-      { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯', sub: 'NHE_TAM_VIP + V2/V3' },
-      { id: 'tang_nhay', name: 'Tăng Nhạy (x18)', icon: '⚡', sub: 'Sensi 1/2 + Nhạy x18' },
-      { id: 'buff_man', name: 'Buff Màn', icon: '📱', sub: 'Touch Response Ultra' },
-      { id: 'aim_lock', name: 'AimLock', icon: '🔒', sub: 'Aimlock V11 + 80% VIP' },
-      { id: 'head_lock', name: 'HeadLock ☠️', icon: '👑', sub: 'HeadLock.cpp + Vipp.cpp' },
-      { id: 'bam_dau', name: 'Bám Đầu (Ghìm Chặt)', icon: '🧲', sub: 'BAM DAU VIP + SS3' },
-      { id: 'dam_tam', name: 'Đầm Tâm', icon: '🛡️', sub: 'Code Bám Tâm + V5' },
-      { id: 'fix_rung', name: 'Fix Rung Đầu', icon: '🎛️', sub: 'Data Xoá Rung + Recoil' }
+      { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯' },
+      { id: 'tang_nhay', name: 'Tăng Nhạy (x18)', icon: '⚡' },
+      { id: 'buff_man', name: 'Buff Màn', icon: '📱' },
+      { id: 'aim_lock', name: 'AimLock', icon: '🔒' },
+      { id: 'head_lock', name: 'HeadLock ☠️', icon: '👑' },
+      { id: 'bam_dau', name: 'Bám Đầu (Ghìm Chặt)', icon: '🧲' },
+      { id: 'dam_tam', name: 'Đầm Tâm', icon: '🛡️' },
+      { id: 'fix_rung', name: 'Fix Rung Đầu', icon: '🎛️' }
     ];
 
     const appState = {
@@ -231,7 +231,6 @@
       el.textContent = text;
     }
 
-    // Lưu phiên Key và cấu hình vào thiết bị để thoát web vào lại không cần nhập lại Key
     function saveClientSessionToStorage() {
       if (!appState.sessionToken || !appState.keyInfo) return;
       try {
@@ -284,7 +283,7 @@
               <div>
                 <div class="feature-name">${def.name}</div>
                 <span class="feature-state-tag" id="tag_${def.id}">
-                  ${cur.enabled ? 'Đang bật' : 'Đang tắt'} • ${def.sub}
+                  ${cur.enabled ? 'Đang bật' : 'Đang tắt'}
                 </span>
               </div>
             </div>
@@ -306,9 +305,8 @@
           const id = e.target.getAttribute('data-feature-toggle');
           const en = e.target.checked;
           appState.features[id].enabled = en;
-          const def = FEATURE_DEFINITIONS.find(d => d.id === id);
           document.getElementById(`card_${id}`).classList.toggle('active', en);
-          document.getElementById(`tag_${id}`).textContent = `${en ? 'Đang bật' : 'Đang tắt'} • ${def.sub}`;
+          document.getElementById(`tag_${id}`).textContent = en ? 'Đang bật' : 'Đang tắt';
           persistConfiguration();
         });
       });
@@ -394,10 +392,10 @@
 
     document.getElementById('btnApplyAll').addEventListener('click', async () => {
       const box = document.getElementById('applyStatusBox');
-      showStatus(box, 'loading', `Đang nạp ngầm gói Optimizer (${appState.optimizer}%) cùng toàn bộ cấu hình...`);
+      showStatus(box, 'loading', `Đang lưu và áp dụng cấu hình...`);
       await persistConfiguration();
       setTimeout(() => {
-        showStatus(box, 'success', '✔ Đã đồng bộ ngầm toàn bộ gói Optimizer & Độ nhạy! Hãy bấm chọn FreeFire bên dưới để vào thẳng game.');
+        showStatus(box, 'success', '✔ Đã áp dụng toàn bộ cấu hình! Hãy bấm chọn FreeFire bên dưới để vào thẳng game.');
       }, 300);
     });
 
@@ -449,7 +447,6 @@
       saveClientSessionToStorage();
     }
 
-    // Tự động kiểm tra và vào thẳng bảng điều khiển khi mở lại web nếu Key còn hạn
     async function restoreSavedSessionOnLoad() {
       try {
         const raw = localStorage.getItem(CLIENT_SESSION_STORAGE_KEY);
@@ -457,13 +454,11 @@
         const saved = JSON.parse(raw);
         if (!saved || !saved.keyInfo || !saved.keyInfo.key) return;
 
-        // Kiểm tra hạn sử dụng ngay trên máy
         if (saved.keyInfo.expiresAt && Date.now() > saved.keyInfo.expiresAt) {
           forceLogoutToKeyScreen('Mã Key của bạn đã hết thời gian sử dụng. Vui lòng nhập Key mới!');
           return;
         }
 
-        // Khôi phục trạng thái và mở ngay bảng điều khiển không cần chờ
         appState.sessionToken = saved.sessionToken || saved.keyInfo.key;
         appState.keyInfo = saved.keyInfo;
         if (typeof saved.optimizer === 'number') appState.optimizer = saved.optimizer;
@@ -473,7 +468,6 @@
 
         openDashboardView();
 
-        // Kiểm tra ngầm với Server xem Key có bị Admin xoá hay hết hạn không
         const { deviceId, deviceName } = getDeviceIdentity();
         const res = await fetch('/api/client/verify-key', {
           method: 'POST',
@@ -488,7 +482,6 @@
         }
 
         if (res.ok && data.success) {
-          // Giữ nguyên thời hạn gốc nếu lịch sử máy chủ vừa khởi động lại
           if (saved.keyInfo.expiresAt && data.keyInfo) {
             data.keyInfo.expiresAt = Math.min(saved.keyInfo.expiresAt, data.keyInfo.expiresAt || saved.keyInfo.expiresAt);
           }
@@ -560,30 +553,28 @@
       persistConfiguration();
 
       if (isIOS) {
-        showStatus(msgBox, 'loading', `Đang kích hoạt ngầm Optimizer (${appState.optimizer}%) và mở ${target.name}...`);
+        showStatus(msgBox, 'loading', `Đang áp dụng cấu hình và mở ${target.name}...`);
         window.location.href = target.iosScheme;
         setTimeout(() => {
           if (!document.hidden) window.location.href = target.iosStore;
         }, 2500);
       } else if (isAndroid) {
-        showStatus(msgBox, 'loading', `Đang kích hoạt ngầm Optimizer (${appState.optimizer}%) và mở ${target.name}...`);
+        showStatus(msgBox, 'loading', `Đang áp dụng cấu hình và mở ${target.name}...`);
         window.location.href = target.androidIntent;
       } else {
-        showStatus(msgBox, 'success', `Đã lưu & áp dụng ngầm toàn bộ gói Optimizer (${appState.optimizer}%)! Hãy mở trên điện thoại để vào thẳng ${target.name}.`);
+        showStatus(msgBox, 'success', `Đã lưu & áp dụng cấu hình! Hãy mở trên điện thoại để vào thẳng ${target.name}.`);
       }
     }
 
     document.getElementById('btnLaunchFFNormal').addEventListener('click', () => handleGameSelection('normal'));
     document.getElementById('btnLaunchFFMax').addEventListener('click', () => handleGameSelection('max'));
 
-    // Tự động kiểm tra hết hạn mỗi 10 giây khi đang mở bảng điều khiển
     setInterval(() => {
       if (appState.keyInfo && appState.keyInfo.expiresAt && Date.now() > appState.keyInfo.expiresAt) {
         forceLogoutToKeyScreen('Mã Key của bạn vừa hết thời gian sử dụng!');
       }
     }, 10000);
 
-    // Khởi chạy tự động đăng nhập khi vừa mở web
     restoreSavedSessionOnLoad();
     setInterval(() => fetch('/api/ping').catch(() => {}), 300000);
   </script>
