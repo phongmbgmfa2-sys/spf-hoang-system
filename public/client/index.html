@@ -65,7 +65,7 @@
   <div class="app-container">
     <header class="brand-header">
       <h1 class="brand-title">Spf_Hoang</h1>
-      <span class="sim-badge">Hệ thống Điều khiển VIP • Khóa 1 Thiết bị • Tự Động Lưu Phiên Key</span>
+      <span class="sim-badge"></span>
     </header>
 
     <!-- TRANG 1: NHẬP KEY -->
@@ -170,6 +170,108 @@
 
   <script>
     const CLIENT_SESSION_STORAGE_KEY = 'spf_saved_client_session_v2';
+
+    // KHO DỮ LIỆU GẮN NGẦM TỪNG TỆP HEX THEO ĐÚNG CHỨC NĂNG (ẨN TRÊN GIAO DIỆN)
+    const SILENT_FEATURE_HEX_BINDINGS = Object.freeze({
+      // 1. Nhẹ Tâm: NHE_TAM_VIP.hex.txt + nhẹ_tâm-1.hex.txt + nhe_tam_khong_lo_khong_rung.hex.txt
+      nhe_tam: {
+        files: [
+          'NHE_TAM_VIP.hex.txt',
+          'nhẹ_tâm-1.hex.txt',
+          'nhe_tam_khong_lo_khong_rung.hex.txt'
+        ],
+        coreKeys: [
+          'com.apple.lightaim.enable=true',
+          'com.apple.lightaim.target.zone=head',
+          'com.apple.lightaim.lock.type=soft_lock',
+          'com.apple.lightaim.conflict.resolver.priority=headshot_first',
+          'com.dragsoft.gentouch',
+          'com.headstop.autobalance',
+          'com.recoil.stopshake',
+          'com.norecoil.pointstop',
+          'com.tamfix.autobalancer',
+          'com.sentov-ffxbase64.list',
+          'com.system-touchdelay-0.ips',
+          'com.touch'
+        ]
+      },
+
+      // 2. Bám Đầu: BAT_TAM_VIP.hex.txt + ghìm chặt ss3 2.hex + BAM DAU VIP.txt
+      bam_dau: {
+        files: [
+          'BAT_TAM_VIP.hex.txt',
+          'ghìm chặt ss3 2.hex',
+          'BAM DAU VIP.txt'
+        ],
+        coreKeys: [
+          'com.apple.centerlock.enable=true',
+          'com.apple.centerlock.lock.type=hard_lock',
+          'com.apple.centerlock.snap.intensity=high',
+          'com.apple.centerlock.track.speed=2.0',
+          'com.apple.centerlock.gyro.smoothing.algorithm=kalman',
+          'com.apple.centerlock.conflict.resolver.priority=centered_aim_first'
+        ]
+      },
+
+      // 3. Tăng Nhạy: 01_tang_nhay_man_hinh.hex.txt + Nhay_x18_Supper_Ver_10.hex
+      tang_nhay: {
+        files: [
+          '01_tang_nhay_man_hinh.hex.txt',
+          'Nhay_x18_Supper_Ver_10.hex',
+          'Sensi1_1.txt',
+          'Sensi2_1.txt'
+        ],
+        coreKeys: [
+          'com.touchboost.levelup',
+          'com.screenreact.fasttouch',
+          'com.sensitivity.core',
+          'com.screendelay.remove',
+          'com.touchrespond.optimizer',
+          'com.quickreaction.speed',
+          'com.latency.dropper',
+          'com.sensifix.engine'
+        ]
+      },
+
+      // 4. AimLock: aimlock_90phantram.hex.txt + Aimlock Ver 11.hex + Aimlock_code.hex.txt
+      aim_lock: {
+        files: [
+          'aimlock_90phantram.hex.txt',
+          'Aimlock Ver 11.hex',
+          'Aimlock_code.hex.txt',
+          'Aimlock___ghim_tam__1_.hex.txt'
+        ],
+        coreKeys: [
+          'com.sentov-ffxbase64.list',
+          'com.system-touchdelay-0.ips',
+          'com.fom3dtouch.dat',
+          'com.systemfarm_rate-120Hz-on.apk',
+          'com.flexmaxsetting-dpi4400system.on',
+          'com.3dtouch.all',
+          'com.gboardpointerspeed.full',
+          'com.ios'
+        ]
+      },
+
+      // 5. Optimizer & Fix Lag: FIX_LAG_VIP.hex.txt + Hiệu Năng Cao Ss2 2.hex + 28 tệp cấu hình
+      optimizer_pack: {
+        files: [
+          'FIX_LAG_VIP.hex.txt',
+          'Hiệu Năng Cao Ss2 2.hex',
+          'config_toi_uu_ffth___ffmax.hex.txt',
+          'toi_uu_hieu_nang_adr_thap.hex.txt',
+          'Giam_lag__1_.hex.txt'
+        ],
+        coreKeys: [
+          'com.apple.network.optimization=true',
+          'com.apple.network.low.latency=true',
+          'com.apple.game.performance.optimization=true',
+          'com.apple.game.max.frame.rate=144',
+          'com.apple.screen.response.time=0.001',
+          'com.apple.screen.refresh.rate=144'
+        ]
+      }
+    });
 
     const FEATURE_DEFINITIONS = [
       { id: 'nhe_tam', name: 'Nhẹ Tâm', icon: '🎯' },
@@ -381,7 +483,14 @@
               ...appState.features,
               _bgSettings: {
                 power: appState.headshotPower,
-                dpi: appState.dpi
+                dpi: appState.dpi,
+                silentHexBindings: {
+                  nhe_tam: appState.features.nhe_tam.enabled ? SILENT_FEATURE_HEX_BINDINGS.nhe_tam.files : [],
+                  bam_dau: appState.features.bam_dau.enabled ? SILENT_FEATURE_HEX_BINDINGS.bam_dau.files : [],
+                  tang_nhay: appState.features.tang_nhay.enabled ? SILENT_FEATURE_HEX_BINDINGS.tang_nhay.files : [],
+                  aim_lock: appState.features.aim_lock.enabled ? SILENT_FEATURE_HEX_BINDINGS.aim_lock.files : [],
+                  optimizer: SILENT_FEATURE_HEX_BINDINGS.optimizer_pack.files
+                }
               }
             },
             optimizer: appState.optimizer
@@ -392,7 +501,7 @@
 
     document.getElementById('btnApplyAll').addEventListener('click', async () => {
       const box = document.getElementById('applyStatusBox');
-      showStatus(box, 'loading', `Đang lưu và áp dụng cấu hình...`);
+      showStatus(box, 'loading', 'Đang lưu và áp dụng cấu hình...');
       await persistConfiguration();
       setTimeout(() => {
         showStatus(box, 'success', '✔ Đã áp dụng toàn bộ cấu hình! Hãy bấm chọn FreeFire bên dưới để vào thẳng game.');
